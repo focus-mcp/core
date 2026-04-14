@@ -8,7 +8,8 @@ overrides:
   tar: ^7.5.13
   glob: ^10.4.5
   minimatch: ^9.0.5
-  jws: ^4.0.0
+  jws: ^4.0.1
+  sequelize: ^6.37.8
 
 importers:
 
@@ -2580,8 +2581,8 @@ packages:
   jwa@2.0.1:
     resolution: {integrity: sha512-hRF04fqJIP8Abbkq5NKGN0Bbr3JxlQ+qhZufXVr0DvujKy93ZCbXZMHDL4EOtodSbCWxOqR8MS1tXA5hwqCXDg==}
 
-  jws@4.0.0:
-    resolution: {integrity: sha512-KDncfTmOZoOMTFG4mBlG0qUIOlc03fmzH+ru6RgYVZhPkyiy/92Owlt/8UEN+a4TXR1FQetfIpJE8ApdvdVxTg==}
+  jws@4.0.1:
+    resolution: {integrity: sha512-EKI/M/yqPncGUUh44xz0PxSidXFr/+r0pA70+gIYhjv+et7yxM+s29Y+VGDkovRofQem0fs7Uvf4+YmAdyRduA==}
 
   keyv@5.6.0:
     resolution: {integrity: sha512-CYDD3SOtsHtyXeEORYRx2qBtpDJFjRTGXUtmNEMGyzYOKj1TE3tycdlho7kA1Ufx9OYWZzg52QFBGALTirzDSw==}
@@ -3426,8 +3427,8 @@ packages:
     resolution: {integrity: sha512-G9c0qlIWQSK29pR/5U2JF5dDQeqqHRragoyahj/Nx4KOOQ3CPPfzxnfqFPCSB7x5UgjOgnZ61nSxz+fjDpRlJg==}
     engines: {node: '>= 10.0.0'}
 
-  sequelize@6.37.7:
-    resolution: {integrity: sha512-mCnh83zuz7kQxxJirtFD7q6Huy6liPanI67BSlbzSYgVNl5eXVdE2CN1FuAeZwG1SNpGsNRCV+bJAVVnykZAFA==}
+  sequelize@6.37.8:
+    resolution: {integrity: sha512-HJ0IQFqcTsTiqbEgiuioYFMSD00TP6Cz7zoTti+zVVBwVe9fEhev9cH6WnM3XU31+ABS356durAb99ZuOthnKw==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       ibm_db: '*'
@@ -4738,7 +4739,7 @@ snapshots:
       hosted-git-info: 9.0.2
       iconv-lite: 0.7.0
       json-stringify-nice: 1.1.4
-      jws: 4.0.0
+      jws: 4.0.1
       minimatch: 9.0.9
       node-stream-zip: 1.15.0
       npm-install-checks: 8.0.0
@@ -4784,7 +4785,7 @@ snapshots:
       compression: 1.8.1
       connect: 3.7.0
       jsonata: 2.1.0
-      sequelize: 6.37.7(@appthreat/sqlite3@6.0.9)
+      sequelize: 6.37.8(@appthreat/sqlite3@6.0.9)
       sqlite3: '@appthreat/sqlite3@6.0.9'
     transitivePeerDependencies:
       - ibm_db
@@ -6747,7 +6748,7 @@ snapshots:
       ecdsa-sig-formatter: 1.0.11
       safe-buffer: 5.2.1
 
-  jws@4.0.0:
+  jws@4.0.1:
     dependencies:
       jwa: 2.0.1
       safe-buffer: 5.2.1
@@ -7676,7 +7677,7 @@ snapshots:
   sequelize-pool@7.1.0:
     optional: true
 
-  sequelize@6.37.7(@appthreat/sqlite3@6.0.9):
+  sequelize@6.37.8(@appthreat/sqlite3@6.0.9):
     dependencies:
       '@types/debug': 4.1.13
       '@types/validator': 13.15.10
