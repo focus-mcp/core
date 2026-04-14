@@ -240,8 +240,10 @@ describe('InProcessEventBus — rate limit', () => {
     bus.handle('a:x', () => bus.request('leaf:x', null));
     bus.handle('b:x', () => bus.request('leaf:x', null));
 
-    // router appelle a puis b : chaque source (router → a, a → leaf, etc.)
-    // possède son propre bucket, donc aucun n'est rate-limité
+    // burst=1 per source. 'router' spends its token on a:x then exhausts
+    // it when calling b:x → RATE_LIMIT_EXCEEDED. a:x → leaf:x uses a's
+    // bucket (not router's), so nested calls keep working. That's the
+    // property under test: buckets are keyed by source, not target.
     await expect(bus.request('a:x', null)).resolves.toBe('ok');
     await expect(bus.request('b:x', null)).rejects.toMatchObject({
       code: 'RATE_LIMIT_EXCEEDED',
