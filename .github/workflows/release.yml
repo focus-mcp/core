@@ -1,11 +1,13 @@
 # SPDX-FileCopyrightText: 2026 FocusMCP contributors
 # SPDX-License-Identifier: MIT
+#
+# Release workflow — disabled on push until NPM_TOKEN secret is configured.
+# Trigger manually via workflow_dispatch when ready to publish.
 
 name: Release
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
