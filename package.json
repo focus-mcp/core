@@ -83,5 +83,13 @@
     "tsup": "^8.3.0",
     "typescript": "^5.7.0",
     "vitest": "^3.2.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "tar": "^7.5.13",
+      "glob": "^10.4.5",
+      "minimatch": "^9.0.5",
+      "jws": "^4.0.0"
+    }
   }
 }
