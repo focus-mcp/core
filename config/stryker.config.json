@@ -1,0 +1,31 @@
+{
+  "$schema": "../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "_comment": "Mutation testing — lancé en nightly, pas en CI standard",
+  "packageManager": "pnpm",
+  "testRunner": "vitest",
+  "vitest": {
+    "configFile": "config/vitest.config.ts"
+  },
+  "reporters": ["clear-text", "progress", "html", "json"],
+  "htmlReporter": {
+    "fileName": "reports/mutation/index.html"
+  },
+  "coverageAnalysis": "perTest",
+  "mutate": [
+    "packages/*/src/**/*.ts",
+    "!packages/*/src/**/*.test.ts",
+    "!packages/*/src/**/*.spec.ts",
+    "!packages/*/src/**/*.d.ts",
+    "!packages/*/src/**/index.ts",
+    "!packages/*/src/**/types/**"
+  ],
+  "thresholds": {
+    "high": 85,
+    "low": 70,
+    "break": 60
+  },
+  "concurrency": 4,
+  "timeoutMS": 60000,
+  "tempDirName": ".stryker-tmp",
+  "incremental": true
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        "config/vitest.config.ts",
+        "config/playwright.config.ts",
+        "config/commitlint.config.js",
+        "config/stryker.config.json"
+      ],
+      "project": ["**/*.{ts,tsx,js,mjs}"]
+    },
+    "packages/core": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "packages/sdk": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "packages/cli": {
+      "entry": ["src/index.ts", "src/bin/*.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "packages/ui": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts"]
+    }
+  },
+  "ignore": ["**/dist/**", "**/coverage/**", "**/.stryker-tmp/**"],
+  "ignoreDependencies": []
+}

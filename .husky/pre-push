@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# SPDX-FileCopyrightText: 2026 FocusMCP contributors
+# SPDX-License-Identifier: MIT
+
+pnpm typecheck && pnpm test

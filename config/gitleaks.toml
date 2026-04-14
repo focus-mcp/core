@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2026 FocusMCP contributors
+# SPDX-License-Identifier: MIT
+#
+# Gitleaks config — extends default rules, allowlist for known false-positives
+
+title = "FocusMCP gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allowlisted paths"
+paths = [
+  '''pnpm-lock\.yaml''',
+  '''.*\.test\.ts''',
+  '''.*\.spec\.ts''',
+  '''docs/.*''',
+]
+
+[[allowlist.regexes]]
+description = "Example tokens in docs"
+regex = '''(EXAMPLE|FAKE|DUMMY|TEST)_TOKEN'''

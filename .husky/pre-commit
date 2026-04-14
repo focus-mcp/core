@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+# SPDX-FileCopyrightText: 2026 FocusMCP contributors
+# SPDX-License-Identifier: MIT
+
+# Secret scanning
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --verbose --config config/gitleaks.toml
+else
+  echo "⚠️  gitleaks not installed — install via https://github.com/gitleaks/gitleaks"
+fi
+
+# Lint + format staged files
+pnpm exec lint-staged --config config/lint-staged.config.js

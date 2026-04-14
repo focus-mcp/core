@@ -1,0 +1,136 @@
+# ============ Dependencies ============
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+.pnp.*
+
+# ============ Build outputs ============
+dist/
+build/
+out/
+lib/
+*.tsbuildinfo
+
+# ============ Framework caches ============
+.next/
+.nuxt/
+.vite/
+.svelte-kit/
+.astro/
+.docusaurus/
+.parcel-cache/
+.rollup-cache/
+.rspack-cache/
+.swc/
+.turbo/
+.nx/
+.cache/
+.tsc-cache/
+.eslintcache
+.stylelintcache
+
+# ============ Tauri / Rust ============
+target/
+src-tauri/target/
+src-tauri/gen/
+src-tauri/WixTools/
+# Cargo.lock NON ignoré (apps binaires)
+
+# ============ Tests & coverage ============
+coverage/
+.nyc_output/
+.stryker-tmp/
+stryker.log
+test-results/
+playwright-report/
+playwright/.cache/
+.vitest-cache/
+reports/
+
+# ============ Husky generated ============
+.husky/_/
+
+# ============ Security artifacts ============
+sbom.json
+.gitleaks.toml.cache
+
+# ============ Logs ============
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ============ Environment & secrets ============
+.env
+.env.local
+.env.*.local
+*.local
+!.env.example
+
+# ============ IDE / Editors ============
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.vscode-test/
+.vscode-server/
+.idea/
+.fleet/
+.zed/
+.history/
+.vs/
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*.swn
+
+# ============ AI coding agents ============
+.claude/
+.cursor/
+.cursorrules.local
+.windsurf/
+.aider*
+.continue/
+.codeium/
+.copilot/
+.ai/
+.ai_cache/
+.openai/
+.gemini/
+.perplexity/
+.replit
+.qwen/
+.ollama/
+.anthropic/
+
+# ============ Cloud / deploy ============
+.vercel/
+.netlify/
+.firebase/
+.terraform/
+.serverless/
+
+# ============ OS files ============
+**/.DS_Store
+**/.AppleDouble
+**/.LSOverride
+**/Thumbs.db
+**/Thumbs.db:encryptable
+**/ehthumbs.db
+**/ehthumbs_vista.db
+**/desktop.ini
+**/$RECYCLE.BIN/
+**/Icon?
+
+# ============ Misc ============
+*.tgz
+*.tar.gz
+*.zip
+*.7z
+core.*
