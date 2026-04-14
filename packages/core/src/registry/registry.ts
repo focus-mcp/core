@@ -104,4 +104,13 @@ export class InMemoryRegistry implements Registry {
     }
     return tools;
   }
+
+  getBrickForTool(toolName: string): string | undefined {
+    for (const [name, entry] of this.#entries) {
+      for (const tool of entry.brick.manifest.tools) {
+        if (tool.name === toolName) return name;
+      }
+    }
+    return undefined;
+  }
 }

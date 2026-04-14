@@ -35,6 +35,9 @@ export interface Registry {
 
   /** Tools agrégés de toutes les briques running. */
   getTools(): readonly ToolDefinition[];
+
+  /** Retourne le nom de la brique qui expose le tool (running ou non). */
+  getBrickForTool(toolName: string): string | undefined;
 }
 
 export class RegistryError extends Error {

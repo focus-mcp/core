@@ -137,6 +137,48 @@ describe('InMemoryRegistry — status', () => {
   });
 });
 
+describe('InMemoryRegistry — getBrickForTool', () => {
+  it('retourne le nom de la brique qui expose le tool', () => {
+    const registry = new InMemoryRegistry();
+    registry.register(
+      fakeBrick({
+        name: 'indexer',
+        tools: [{ name: 'indexer_search', description: '', inputSchema: { type: 'object' } }],
+      }),
+    );
+
+    expect(registry.getBrickForTool('indexer_search')).toBe('indexer');
+  });
+
+  it("retourne undefined si le tool n'est exposé par aucune brique", () => {
+    const registry = new InMemoryRegistry();
+
+    expect(registry.getBrickForTool('ghost_tool')).toBeUndefined();
+  });
+
+  it("cherche parmi plusieurs tools d'une brique et plusieurs briques", () => {
+    const registry = new InMemoryRegistry();
+    registry.register(
+      fakeBrick({
+        name: 'indexer',
+        tools: [
+          { name: 'indexer_search', description: '', inputSchema: { type: 'object' } },
+          { name: 'indexer_stats', description: '', inputSchema: { type: 'object' } },
+        ],
+      }),
+    );
+    registry.register(
+      fakeBrick({
+        name: 'php',
+        tools: [{ name: 'php_analyze', description: '', inputSchema: { type: 'object' } }],
+      }),
+    );
+
+    expect(registry.getBrickForTool('indexer_stats')).toBe('indexer');
+    expect(registry.getBrickForTool('php_analyze')).toBe('php');
+  });
+});
+
 describe('InMemoryRegistry — getTools', () => {
   it('agrège les tools de toutes les briques running', () => {
     const registry = new InMemoryRegistry();

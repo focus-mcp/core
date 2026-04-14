@@ -34,7 +34,8 @@
         "noExcessiveCognitiveComplexity": {
           "level": "error",
           "options": { "maxAllowedComplexity": 15 }
-        }
+        },
+        "useLiteralKeys": "off"
       },
       "correctness": {
         "noUnusedVariables": "error",
