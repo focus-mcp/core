@@ -30,13 +30,14 @@ Voir [PRD.md](./PRD.md) pour les détails complets.
 
 ```
 packages/
-  core/   — Registry + EventBus + Router
+  core/   — Registry + EventBus + Router + transport HTTP/HTTPS
   sdk/    — outils pour développer une brique
   cli/    — focus CLI (start, add, remove…)
-  ui/     — dashboard Svelte
-apps/
-  tauri/  — app desktop (shell Tauri + sidecar Node.js)
 ```
+
+**Repos compagnons** :
+- [`focus-mcp/client`](https://github.com/focus-mcp/client) — app Tauri (shell desktop + UI dashboard)
+- [`focus-mcp/marketplace`](https://github.com/focus-mcp/marketplace) — briques officielles (`focus-indexer`, `focus-memory`…)
 
 ## Démarrer
 

@@ -3,45 +3,44 @@ SPDX-FileCopyrightText: 2026 FocusMCP contributors
 SPDX-License-Identifier: MIT
 -->
 
-# Roadmap FocusMCP
+# Roadmap FocusMCP — `core`
 
 Voir [PRD.md](../PRD.md) pour les détails fonctionnels complets.
+
+> Ce repo contient le **runtime** (Registry + EventBus + Router + transport HTTP/HTTPS + SDK + CLI).
+> L'app desktop est dans [`focus-mcp/client`](https://github.com/focus-mcp/client).
+> Les briques officielles sont dans [`focus-mcp/marketplace`](https://github.com/focus-mcp/marketplace).
 
 ## Phase 0 — Fondations (en cours)
 
 - [x] PRD finalisé
 - [x] Setup monorepo + tooling pro (TS strict, Biome, Vitest, husky, GitLab CI…)
-- [ ] Bootstrap interfaces TS du core
-- [ ] EventBus en TDD (>=95% coverage)
-- [ ] McpRegistry en TDD (>=95% coverage)
-- [ ] MCP Router (Streamable HTTP) avec conformité spec MCP 2025-03-26
-- [ ] `focus-validator` (test runner pour briques)
+- [x] Interfaces TS du core (Brick, Manifest, Tool, EventBus, Registry, Router)
+- [x] `InProcessEventBus` (TDD, coverage ≥95/90%)
+- [x] `InMemoryRegistry` (TDD, coverage 100/97%)
+- [x] `McpRouter` (TDD, coverage 100%)
+- [x] Transport HTTP + HTTPS (spec MCP 2025-03-26 via SDK officiel)
+- [ ] `focus-validator` — test runner pour briques tierces
+- [ ] SDK brique (`@focusmcp/sdk`) — helpers pour écrire une brique
 
-## Phase 1 — Premières briques officielles
+## Phase 1 — CLI et ergonomie
 
-- [ ] `focus-indexer` — indexation FTS5/BM25
-- [ ] `focus-memory` — persistance session SQLite
-- [ ] `focus-sandbox` — exécution JS éphémère
-- [ ] `focus-thinking` — reasoning externalisé
+- [ ] CLI : `focus start`, `focus stop`, `focus status`, `focus logs`
+- [ ] CLI : `focus add/remove/update` (installation briques depuis marketplace)
+- [ ] Fichiers : `.centerrc`, `center.json`, `center.lock`
+- [ ] Chargement dynamique de briques au runtime (hot-reload)
 
-## Phase 2 — UI et expérience
+## Phase 2 — Maturité core
 
-- [ ] App Tauri (shell + sidecar)
-- [ ] Dashboard Svelte (briques, logs, métriques)
-- [ ] Visualisation graphe de dépendances
-- [ ] Hot-reload des briques
+- [ ] Garde-fous EventBus complets : rate limit, circuit breaker
+- [ ] Permissions inter-briques (whitelist via manifeste `dependencies`)
+- [ ] Monitoring : métriques agrégées par brique, traces OpenTelemetry
+- [ ] Authentification optionnelle pour mode serveur
+- [ ] Mode stdio (transport alternatif au HTTP)
 
 ## Phase 3 — Écosystème
 
-- [ ] Catalogues tiers
-- [ ] SDK + documentation pour devs de briques
-- [ ] Briques par framework (focus-php, focus-symfony, focus-doctrine, focus-twig, focus-react…)
-- [ ] Hook-based routing (adapters Claude Code, Cursor, Codex, Gemini CLI…)
-
-## Phase 4 — Industrialisation
-
-- [ ] `focus-worktree` (parallélisation git)
-- [ ] `focus-reactor` (événements externes : CI, PR, webhooks)
-- [ ] Mode serveur multi-tenants
-- [ ] Métriques Prometheus
-- [ ] i18n complète
+- [ ] Hook-based routing : adaptateurs clients (Claude Code, Cursor, Codex...)
+- [ ] Catalogues tiers (URL, GitHub, local)
+- [ ] Auto-update briques + catalogues
+- [ ] Changesets + release automatisée

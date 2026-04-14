@@ -16,7 +16,8 @@ SPDX-License-Identifier: MIT
 
 - **Node.js ≥ 22** (LTS), **pnpm ≥ 10**, **TypeScript 5.7+** strict
 - **ESM only** (`"type": "module"`, pas de CJS)
-- Monorepo **pnpm workspaces** : `packages/{core,sdk,cli,ui}` + `apps/tauri`
+- Monorepo **pnpm workspaces** : `packages/{core,sdk,cli}` (ce repo = `core`)
+- Repos compagnons : `focus-mcp/client` (Tauri), `focus-mcp/marketplace` (briques)
 - Tests : **Vitest** (unit), **fast-check** (property-based), **Stryker** (mutation), **Playwright** (E2E)
 - Lint/format : **Biome 2.x** (pas ESLint+Prettier)
 - Logs : **pino** (`@focusmcp/core/observability/logger`)
