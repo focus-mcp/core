@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 ## Description
 
-Résumé du changement et motivation. Si lié à une issue : `Closes #N`.
+Summary of the change and motivation. If linked to an issue: `Closes #N`.
 
 ## Type
 
@@ -19,22 +19,22 @@ Résumé du changement et motivation. Si lié à une issue : `Closes #N`.
 
 ## Checklist
 
-- [ ] TDD : tests écrits avant l'implémentation
-- [ ] Coverage ≥ 80% (≥ 95% sur EventBus/Registry)
-- [ ] `pnpm lint` passe
-- [ ] `pnpm typecheck` passe
-- [ ] `pnpm test` passe
-- [ ] Conventional Commits respectés
-- [ ] Changeset ajouté (`pnpm changeset`) si changement utilisateur
-- [ ] ADR créé si décision architecturale (`docs/adr/`)
-- [ ] Documentation mise à jour si nécessaire
-- [ ] SPDX headers présents dans les nouveaux fichiers
+- [ ] TDD: tests written before implementation
+- [ ] Coverage ≥ 80% (≥ 95% on EventBus/Registry)
+- [ ] `pnpm lint` passes
+- [ ] `pnpm typecheck` passes
+- [ ] `pnpm test` passes
+- [ ] Conventional Commits respected
+- [ ] Changeset added (`pnpm changeset`) if user-facing change
+- [ ] ADR created if architecture decision (`docs/adr/`)
+- [ ] Documentation updated if necessary
+- [ ] SPDX headers present in new files
 
 ## Breaking changes
 
-- [ ] Aucun
-- [ ] Breaking — détailler ci-dessous + migration guide
+- [ ] None
+- [ ] Breaking — detail below + migration guide
 
 ## Tests
 
-Décris comment les changements ont été testés.
+Describe how the changes were tested.

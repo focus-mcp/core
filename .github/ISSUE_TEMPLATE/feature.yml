@@ -2,33 +2,33 @@
 # SPDX-License-Identifier: MIT
 
 name: Feature request
-description: Propose une nouvelle fonctionnalité
+description: Propose a new feature
 labels: [feature]
 body:
   - type: textarea
     id: problem
     attributes:
-      label: Problème à résoudre
-      description: Décris le problème ou le besoin utilisateur. Pas de solution ici.
+      label: Problem to solve
+      description: Describe the problem or user need. No solution here.
     validations:
       required: true
   - type: textarea
     id: solution
     attributes:
-      label: Solution proposée
+      label: Proposed solution
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives considérées
+      label: Alternatives considered
   - type: checkboxes
     id: impact
     attributes:
       label: Impact
       options:
-        - label: Breaking change (bump majeur)
-        - label: Modification du core (Registry / EventBus / Router)
+        - label: Breaking change (major bump)
+        - label: Core modification (Registry / EventBus / Router)
         - label: CLI
         - label: SDK
         - label: Documentation
@@ -37,4 +37,4 @@ body:
     attributes:
       label: ADR
       options:
-        - label: Cette feature nécessite un ADR (décision architecturale)
+        - label: This feature requires an ADR (architecture decision)

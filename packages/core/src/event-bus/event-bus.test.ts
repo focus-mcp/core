@@ -2,8 +2,17 @@
 // SPDX-License-Identifier: MIT
 
 import { describe, expect, it, vi } from 'vitest';
-import { EventBusError } from '../types/event-bus.ts';
-import { InProcessEventBus } from './event-bus.ts';
+import { EventBusError, type EventBusGuards } from '../types/event-bus.ts';
+import { DEFAULT_GUARDS, InProcessEventBus } from './event-bus.ts';
+
+const baseGuards = (overrides: Partial<EventBusGuards> = {}): EventBusGuards => ({
+  maxDepth: 16,
+  defaultTimeoutMs: 1000,
+  maxPayloadBytes: 1024 * 1024,
+  rateLimit: { callsPerSecond: 1000, burstSize: 2000 },
+  circuitBreaker: { failureThreshold: 100, cooldownMs: 1000 },
+  ...overrides,
+});
 
 describe('InProcessEventBus — pub/sub', () => {
   it('appelle tous les handlers abonnés à un événement', () => {
@@ -160,15 +169,7 @@ describe('InProcessEventBus — request/response', () => {
 
 describe('InProcessEventBus — garde-fous', () => {
   it('TIMEOUT : rejette si le handler ne répond pas dans le délai', async () => {
-    const bus = new InProcessEventBus({
-      ...{
-        maxDepth: 16,
-        defaultTimeoutMs: 50,
-        maxPayloadBytes: 1024,
-        rateLimit: { callsPerSecond: 100, burstSize: 200 },
-        circuitBreaker: { failureThreshold: 5, cooldownMs: 30_000 },
-      },
-    });
+    const bus = new InProcessEventBus(baseGuards({ defaultTimeoutMs: 50 }));
     bus.handle('slow:op', () => new Promise((resolve) => setTimeout(resolve, 200)));
 
     await expect(bus.request('slow:op', null)).rejects.toMatchObject({
@@ -178,13 +179,7 @@ describe('InProcessEventBus — garde-fous', () => {
   });
 
   it('MAX_DEPTH_EXCEEDED : bloque les boucles infinies inter-briques', async () => {
-    const bus = new InProcessEventBus({
-      maxDepth: 3,
-      defaultTimeoutMs: 1000,
-      maxPayloadBytes: 1024,
-      rateLimit: { callsPerSecond: 1000, burstSize: 2000 },
-      circuitBreaker: { failureThreshold: 100, cooldownMs: 1000 },
-    });
+    const bus = new InProcessEventBus(baseGuards({ maxDepth: 3 }));
 
     bus.handle('a:call', () => bus.request('b:call', null));
     bus.handle('b:call', () => bus.request('a:call', null));
@@ -196,13 +191,7 @@ describe('InProcessEventBus — garde-fous', () => {
   });
 
   it('PAYLOAD_TOO_LARGE : rejette les payloads dépassant maxPayloadBytes', async () => {
-    const bus = new InProcessEventBus({
-      maxDepth: 16,
-      defaultTimeoutMs: 1000,
-      maxPayloadBytes: 100,
-      rateLimit: { callsPerSecond: 1000, burstSize: 2000 },
-      circuitBreaker: { failureThreshold: 100, cooldownMs: 1000 },
-    });
+    const bus = new InProcessEventBus(baseGuards({ maxPayloadBytes: 100 }));
     bus.handle('echo', (payload) => payload);
 
     const tooBig = 'x'.repeat(1000);
@@ -211,5 +200,153 @@ describe('InProcessEventBus — garde-fous', () => {
       name: 'EventBusError',
       code: 'PAYLOAD_TOO_LARGE',
     });
+  });
+});
+
+describe('InProcessEventBus — rate limit', () => {
+  it('RATE_LIMIT_EXCEEDED : rejette au-delà du burst size par source', async () => {
+    const bus = new InProcessEventBus(
+      baseGuards({ rateLimit: { callsPerSecond: 1, burstSize: 2 } }),
+    );
+    bus.handle('target:call', () => 'ok');
+
+    await expect(bus.request('target:call', null)).resolves.toBe('ok');
+    await expect(bus.request('target:call', null)).resolves.toBe('ok');
+    await expect(bus.request('target:call', null)).rejects.toMatchObject({
+      name: 'EventBusError',
+      code: 'RATE_LIMIT_EXCEEDED',
+    });
+  });
+
+  it('refill les tokens proportionnellement au temps écoulé', async () => {
+    const bus = new InProcessEventBus(
+      baseGuards({ rateLimit: { callsPerSecond: 200, burstSize: 1 } }),
+    );
+    bus.handle('target:call', () => 'ok');
+
+    await bus.request('target:call', null);
+    await expect(bus.request('target:call', null)).rejects.toMatchObject({
+      code: 'RATE_LIMIT_EXCEEDED',
+    });
+    await new Promise((r) => setTimeout(r, 20));
+    await expect(bus.request('target:call', null)).resolves.toBe('ok');
+  });
+
+  it('sépare les buckets par source (appelant)', async () => {
+    const bus = new InProcessEventBus(
+      baseGuards({ rateLimit: { callsPerSecond: 1, burstSize: 1 } }),
+    );
+    bus.handle('leaf:x', () => 'ok');
+    bus.handle('a:x', () => bus.request('leaf:x', null));
+    bus.handle('b:x', () => bus.request('leaf:x', null));
+
+    // burst=1 per source. 'router' spends its token on a:x then exhausts
+    // it when calling b:x → RATE_LIMIT_EXCEEDED. a:x → leaf:x uses a's
+    // bucket (not router's), so nested calls keep working. That's the
+    // property under test: buckets are keyed by source, not target.
+    await expect(bus.request('a:x', null)).resolves.toBe('ok');
+    await expect(bus.request('b:x', null)).rejects.toMatchObject({
+      code: 'RATE_LIMIT_EXCEEDED',
+    });
+  });
+});
+
+describe('InProcessEventBus — circuit breaker', () => {
+  it('CIRCUIT_OPEN : ouvre après failureThreshold échecs consécutifs', async () => {
+    const bus = new InProcessEventBus(
+      baseGuards({ circuitBreaker: { failureThreshold: 2, cooldownMs: 1000 } }),
+    );
+    bus.handle('flaky:call', () => {
+      throw new Error('boom');
+    });
+
+    await expect(bus.request('flaky:call', null)).rejects.toThrow('boom');
+    await expect(bus.request('flaky:call', null)).rejects.toThrow('boom');
+    await expect(bus.request('flaky:call', null)).rejects.toMatchObject({
+      name: 'EventBusError',
+      code: 'CIRCUIT_OPEN',
+    });
+  });
+
+  it('referme le circuit après cooldown si l’appel half-open réussit', async () => {
+    let shouldFail = true;
+    const bus = new InProcessEventBus(
+      baseGuards({ circuitBreaker: { failureThreshold: 2, cooldownMs: 50 } }),
+    );
+    bus.handle('flaky:call', () => {
+      if (shouldFail) throw new Error('boom');
+      return 'ok';
+    });
+
+    await expect(bus.request('flaky:call', null)).rejects.toThrow('boom');
+    await expect(bus.request('flaky:call', null)).rejects.toThrow('boom');
+    await expect(bus.request('flaky:call', null)).rejects.toMatchObject({
+      code: 'CIRCUIT_OPEN',
+    });
+
+    shouldFail = false;
+    await new Promise((r) => setTimeout(r, 60));
+    await expect(bus.request('flaky:call', null)).resolves.toBe('ok');
+    await expect(bus.request('flaky:call', null)).resolves.toBe('ok');
+  });
+
+  it('un succès réinitialise le compteur d’échecs (pas d’ouverture sur échecs non consécutifs)', async () => {
+    let call = 0;
+    const bus = new InProcessEventBus(
+      baseGuards({ circuitBreaker: { failureThreshold: 2, cooldownMs: 1000 } }),
+    );
+    bus.handle('intermittent:call', () => {
+      call += 1;
+      if (call % 2 === 1) throw new Error('boom');
+      return 'ok';
+    });
+
+    await expect(bus.request('intermittent:call', null)).rejects.toThrow('boom');
+    await expect(bus.request('intermittent:call', null)).resolves.toBe('ok');
+    await expect(bus.request('intermittent:call', null)).rejects.toThrow('boom');
+    await expect(bus.request('intermittent:call', null)).resolves.toBe('ok');
+    await expect(bus.request('intermittent:call', null)).rejects.toThrow('boom');
+  });
+});
+
+describe('InProcessEventBus — permissions', () => {
+  it('PERMISSION_DENIED : une brique ne peut pas appeler hors de ses dépendances déclarées', async () => {
+    const bus = new InProcessEventBus(DEFAULT_GUARDS, {
+      permissionProvider: (source) => (source === 'php' ? ['indexer'] : []),
+    });
+    bus.handle('symfony:find', () => 'ok');
+    bus.handle('php:analyze', () => bus.request('symfony:find', null));
+
+    await expect(bus.request('php:analyze', null)).rejects.toMatchObject({
+      name: 'EventBusError',
+      code: 'PERMISSION_DENIED',
+    });
+  });
+
+  it('autorise un appel vers une brique listée dans les dépendances', async () => {
+    const bus = new InProcessEventBus(DEFAULT_GUARDS, {
+      permissionProvider: (source) => (source === 'php' ? ['indexer'] : []),
+    });
+    bus.handle('indexer:search', () => ({ files: ['a.php'] }));
+    bus.handle('php:analyze', () => bus.request('indexer:search', null));
+
+    await expect(bus.request('php:analyze', null)).resolves.toEqual({ files: ['a.php'] });
+  });
+
+  it('n’applique pas les permissions aux appels entrants du router', async () => {
+    const bus = new InProcessEventBus(DEFAULT_GUARDS, {
+      permissionProvider: () => [],
+    });
+    bus.handle('anything:x', () => 'ok');
+
+    await expect(bus.request('anything:x', null)).resolves.toBe('ok');
+  });
+
+  it('sans permissionProvider : aucune restriction (compat par défaut)', async () => {
+    const bus = new InProcessEventBus();
+    bus.handle('a:x', () => bus.request('b:x', null));
+    bus.handle('b:x', () => 'ok');
+
+    await expect(bus.request('a:x', null)).resolves.toBe('ok');
   });
 });

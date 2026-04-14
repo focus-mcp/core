@@ -7,41 +7,41 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: Merci de remplir ce formulaire pour faciliter le triage.
+      value: Thanks for filling this out — it helps triage.
   - type: textarea
     id: description
     attributes:
       label: Description
-      description: Description claire et concise du bug.
+      description: Clear and concise description of the bug.
     validations:
       required: true
   - type: textarea
     id: reproduction
     attributes:
       label: Reproduction
-      description: Étapes pour reproduire le bug.
+      description: Steps to reproduce the bug.
       placeholder: |
-        1. Aller à '...'
-        2. Lancer '...'
-        3. Voir l'erreur
+        1. Go to '...'
+        2. Run '...'
+        3. See error
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Comportement attendu
+      label: Expected behavior
     validations:
       required: true
   - type: textarea
     id: actual
     attributes:
-      label: Comportement observé
+      label: Actual behavior
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: Version FocusMCP
+      label: FocusMCP version
       placeholder: '0.1.0'
     validations:
       required: true
@@ -56,7 +56,7 @@ body:
         - macOS 13
         - Ubuntu 22.04
         - Ubuntu 24.04
-        - Autre Linux
+        - Other Linux
     validations:
       required: true
   - type: input
@@ -80,4 +80,4 @@ body:
     id: logs
     attributes:
       label: Logs / screenshots
-      description: Logs pertinents (pino output), stack traces, etc.
+      description: Relevant logs (structured JSON output), stack traces, etc.

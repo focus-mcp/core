@@ -8,6 +8,13 @@ import { defineConfig } from 'vitest/config';
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@focusmcp/core': resolve(projectRoot, 'packages/core/src/index.ts'),
+      '@focusmcp/sdk': resolve(projectRoot, 'packages/sdk/src/index.ts'),
+      '@focusmcp/validator': resolve(projectRoot, 'packages/validator/src/index.ts'),
+    },
+  },
   test: {
     globals: false,
     environment: 'node',

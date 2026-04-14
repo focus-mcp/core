@@ -1,11 +1,16 @@
 {
-  "name": "@focusmcp/cli",
+  "name": "@focusmcp/validator",
   "version": "0.0.0",
-  "description": "FocusMCP CLI — focus start, add, remove, update...",
+  "description": "FocusMCP validator — vérifie qu'une brique respecte le contrat FocusMCP",
   "license": "MIT",
   "type": "module",
-  "bin": {
-    "focus": "./dist/bin/focus.js"
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "files": [
     "dist",
@@ -16,6 +21,9 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "@focusmcp/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

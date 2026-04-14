@@ -1,32 +1,28 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignoreExportsUsedInFile": true,
   "workspaces": {
     ".": {
       "entry": [
         "config/vitest.config.ts",
         "config/playwright.config.ts",
         "config/commitlint.config.js",
+        "config/lint-staged.config.js",
         "config/stryker.config.json"
       ],
       "project": ["**/*.{ts,tsx,js,mjs}"]
     },
-    "packages/core": {
-      "entry": ["src/index.ts"],
-      "project": ["src/**/*.ts"]
-    },
-    "packages/sdk": {
-      "entry": ["src/index.ts"],
-      "project": ["src/**/*.ts"]
-    },
+    "packages/core": {},
+    "packages/sdk": {},
     "packages/cli": {
-      "entry": ["src/index.ts", "src/bin/*.ts"],
-      "project": ["src/**/*.ts"]
+      "entry": ["src/index.ts", "src/bin/*.ts"]
     },
-    "packages/ui": {
-      "entry": ["src/index.ts"],
-      "project": ["src/**/*.ts"]
-    }
+    "packages/validator": {}
   },
-  "ignore": ["**/dist/**", "**/coverage/**", "**/.stryker-tmp/**"],
-  "ignoreDependencies": []
+  "ignoreDependencies": [
+    "@commitlint/config-conventional",
+    "@stryker-mutator/vitest-runner",
+    "fast-check"
+  ],
+  "ignoreBinaries": ["playwright", "reuse"]
 }
