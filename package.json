@@ -69,6 +69,7 @@
     "@commitlint/types": "^19.8.1",
     "@cyclonedx/cdxgen": "^11.0.0",
     "@playwright/test": "^1.59.1",
+    "@size-limit/preset-small-lib": "^12.1.0",
     "@stryker-mutator/core": "^9.0.0",
     "@stryker-mutator/vitest-runner": "^9.0.0",
     "@types/node": "^22.10.0",
