@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: 2026 FocusMCP contributors
+# SPDX-License-Identifier: MIT
+
+name: Feature request
+description: Propose une nouvelle fonctionnalité
+labels: [feature]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problème à résoudre
+      description: Décris le problème ou le besoin utilisateur. Pas de solution ici.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution proposée
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considérées
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Impact
+      options:
+        - label: Breaking change (bump majeur)
+        - label: Modification du core (Registry / EventBus / Router)
+        - label: CLI
+        - label: SDK
+        - label: Documentation
+  - type: checkboxes
+    id: adr
+    attributes:
+      label: ADR
+      options:
+        - label: Cette feature nécessite un ADR (décision architecturale)

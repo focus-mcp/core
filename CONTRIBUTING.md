@@ -20,7 +20,7 @@ Tous les contributeurs s'engagent à respecter le [Code of Conduct](./CODE_OF_CO
 5. **Test** : `pnpm test` (coverage ≥80% global, ≥95% sur EventBus/Registry)
 6. **Commit** en [Conventional Commits](https://www.conventionalcommits.org/) — enforced par commitlint
 7. **Changeset** : `pnpm changeset` si la PR introduit un changement utilisateur
-8. **Push** et ouvre une Merge Request
+8. **Push** et ouvre une Pull Request sur [GitHub](https://github.com/focus-mcp/core/pulls)
 
 ## Standards
 
@@ -43,7 +43,7 @@ Format : [MADR](https://adr.github.io/madr/).
 
 ## Reporter un bug / proposer une feature
 
-Ouvre une issue avec le template approprié dans [`.gitlab/issue_templates/`](./.gitlab/issue_templates/).
+Ouvre une issue avec le template approprié : [bug](https://github.com/focus-mcp/core/issues/new?template=bug.yml) ou [feature](https://github.com/focus-mcp/core/issues/new?template=feature.yml).
 
 ## Sécurité
 

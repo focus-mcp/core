@@ -3,9 +3,11 @@ SPDX-FileCopyrightText: 2026 FocusMCP contributors
 SPDX-License-Identifier: MIT
 -->
 
-# FocusMCP
+# FocusMCP — core
 
 > **Focaliser les agents AI sur l'essentiel.**
+>
+> 🌐 [focusmcp.dev](https://focusmcp.dev) · 📖 [PRD](./PRD.md) · 🗺️ [Roadmap](./docs/ROADMAP.md)
 
 FocusMCP est un **écosystème intelligent de briques MCP** qui communiquent entre elles, travaillent ensemble, et sont chargées à la demande. Les briques optimisent la compréhension du code, filtrent les données et distillent les résultats pour **minimiser les tokens et le contexte** envoyés à l'agent AI.
 
@@ -35,7 +37,7 @@ packages/
   cli/    — focus CLI (start, add, remove…)
 ```
 
-**Repos compagnons** :
+**Repos compagnons** (même org [`focus-mcp`](https://github.com/focus-mcp)) :
 - [`focus-mcp/client`](https://github.com/focus-mcp/client) — app Tauri (shell desktop + UI dashboard)
 - [`focus-mcp/marketplace`](https://github.com/focus-mcp/marketplace) — briques officielles (`focus-indexer`, `focus-memory`…)
 

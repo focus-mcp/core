@@ -12,7 +12,11 @@
   "packageManager": "pnpm@10.32.1",
   "repository": {
     "type": "git",
-    "url": "git@gitlab.com:4k1r4-1337/mcp/focusMcp.git"
+    "url": "git+https://github.com/focus-mcp/core.git"
+  },
+  "homepage": "https://focusmcp.dev",
+  "bugs": {
+    "url": "https://github.com/focus-mcp/core/issues"
   },
   "scripts": {
     "build": "pnpm -r --filter \"./packages/**\" build",

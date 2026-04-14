@@ -14,8 +14,8 @@ Le projet est en pré-MVP (`0.x`). Aucune version n'est encore considérée comm
 **Ne pas ouvrir d'issue publique** pour une vulnérabilité de sécurité.
 
 Envoyer un rapport privé via :
-- GitLab : utiliser l'option [Confidential issues](https://docs.gitlab.com/ee/user/project/issues/confidential_issues.html)
-- ou par email : à définir
+- **[GitHub Security Advisories](https://github.com/focus-mcp/core/security/advisories/new)** (recommandé)
+- ou par email : security@focusmcp.dev
 
 Inclure si possible :
 - Description du problème

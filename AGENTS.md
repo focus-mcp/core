@@ -10,7 +10,8 @@ SPDX-License-Identifier: MIT
 
 ## Projet
 
-**FocusMCP** — orchestrateur de briques MCP atomiques. Lire [PRD.md](./PRD.md) pour la vision complète, l'architecture (3 piliers : Registry + EventBus + Router), et les décisions prises.
+**FocusMCP** — orchestrateur de briques MCP atomiques. Site : https://focusmcp.dev.
+Lire [PRD.md](./PRD.md) pour la vision complète, l'architecture (3 piliers : Registry + EventBus + Router), et les décisions prises.
 
 ## Stack
 
@@ -87,6 +88,10 @@ packages/core/src/
 - **Pas de `eval`**, pas de `new Function()`
 - Toute exécution de code arbitraire passe par la brique `focus-sandbox` (V8 isolé)
 - Tout accès filesystem/réseau côté brique passe par Tauri (rust)
+
+## Remote Git
+
+- **origin** : `git@github.com:focus-mcp/core.git` (GitHub, CI principale via GitHub Actions)
 
 ## Inspirations / sources
 

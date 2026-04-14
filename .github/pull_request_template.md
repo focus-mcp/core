@@ -7,22 +7,20 @@ SPDX-License-Identifier: MIT
 
 Résumé du changement et motivation. Si lié à une issue : `Closes #N`.
 
-## Type de changement
+## Type
 
-- [ ] feat : nouvelle fonctionnalité
-- [ ] fix : correction de bug
-- [ ] docs : documentation
-- [ ] refactor : refactorisation sans changement de comportement
-- [ ] perf : amélioration de performance
-- [ ] test : ajout/modification de tests
-- [ ] build : build / dépendances
-- [ ] ci : pipeline CI
-- [ ] chore : autre
+- [ ] feat
+- [ ] fix
+- [ ] docs
+- [ ] refactor
+- [ ] perf
+- [ ] test
+- [ ] build / ci / chore
 
 ## Checklist
 
-- [ ] Tests ajoutés (TDD : tests écrits avant l'implémentation)
-- [ ] Coverage ≥ 80% (≥ 95% si EventBus/Registry)
+- [ ] TDD : tests écrits avant l'implémentation
+- [ ] Coverage ≥ 80% (≥ 95% sur EventBus/Registry)
 - [ ] `pnpm lint` passe
 - [ ] `pnpm typecheck` passe
 - [ ] `pnpm test` passe
@@ -39,4 +37,4 @@ Résumé du changement et motivation. Si lié à une issue : `Closes #N`.
 
 ## Tests
 
-Décrire comment les changements ont été testés.
+Décris comment les changements ont été testés.

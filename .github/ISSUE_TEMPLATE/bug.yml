@@ -1,0 +1,83 @@
+# SPDX-FileCopyrightText: 2026 FocusMCP contributors
+# SPDX-License-Identifier: MIT
+
+name: Bug report
+description: Report a reproducible bug
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Merci de remplir ce formulaire pour faciliter le triage.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Description claire et concise du bug.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Étapes pour reproduire le bug.
+      placeholder: |
+        1. Aller à '...'
+        2. Lancer '...'
+        3. Voir l'erreur
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportement attendu
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportement observé
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version FocusMCP
+      placeholder: '0.1.0'
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS 14
+        - macOS 13
+        - Ubuntu 22.04
+        - Ubuntu 24.04
+        - Autre Linux
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version
+      placeholder: 'v22.x'
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - CLI
+        - HTTP server
+        - HTTPS server
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Logs pertinents (pino output), stack traces, etc.
