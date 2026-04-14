@@ -9,14 +9,13 @@ title = "FocusMCP gitleaks config"
 useDefault = true
 
 [allowlist]
-description = "Allowlisted paths"
+description = "Allowlisted paths and example tokens in docs"
 paths = [
   '''pnpm-lock\.yaml''',
   '''.*\.test\.ts''',
   '''.*\.spec\.ts''',
   '''docs/.*''',
 ]
-
-[[allowlist.regexes]]
-description = "Example tokens in docs"
-regex = '''(EXAMPLE|FAKE|DUMMY|TEST)_TOKEN'''
+regexes = [
+  '''(EXAMPLE|FAKE|DUMMY|TEST)_TOKEN''',
+]
