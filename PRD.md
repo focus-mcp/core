@@ -1,7 +1,7 @@
 # @focusmcp/core — Product Requirements Document
 
-> Périmètre de ce document : la **bibliothèque TypeScript** `@focusmcp/core` (monorepo `core/`).
-> Pour l'app desktop : voir [`client/PRD.md`](../client/PRD.md). Pour le catalogue de briques : voir [`marketplace/PRD.md`](../marketplace/PRD.md).
+> Périmètre de ce document : la **bibliothèque TypeScript** `@focusmcp/core` (package `packages/core` du monorepo).
+> Pour l'app desktop : voir le repo [`focus-mcp/client`](https://github.com/focus-mcp/client). Pour le catalogue de briques : voir le repo [`focus-mcp/marketplace`](https://github.com/focus-mcp/marketplace).
 
 ## Vision (rappel)
 
@@ -160,7 +160,7 @@ Format `mcp-brick.json` (parsé par `parseManifest`) :
 }
 ```
 
-Validation stricte : nom (`focus-<domaine>`), version semver, namespace `brique:action` pour les events, dépendances déclarées.
+Validation stricte (par `parseManifest`) : nom en kebab-case (ex: `php`, `indexer`, `sf-router`), version semver, tools (nom + JSON Schema d'entrée), dépendances déclarées, config typée. La convention `focus-<domaine>` est appliquée au niveau du marketplace officiel (cf. `marketplace/PRD.md`), pas par le parser.
 
 ---
 
@@ -186,14 +186,14 @@ export default defineBrick({
 
 ## Validator — `@focusmcp/validator`
 
-Test runner qui valide qu'une brique respecte le contrat FocusMCP :
-- Manifeste valide (schema)
-- Tools déclarés conformes au schéma JSON Schema
-- Namespace `brique:action` respecté
-- Dépendances déclarées correspondent aux appels effectifs
-- Garde-fous EventBus respectés (pas de bypass)
+Test runner qui valide qu'une brique respecte le contrat FocusMCP. Checks actuellement implémentés :
+- Manifeste valide (`INVALID_MANIFEST` via `parseManifest`)
+- Démarrage propre (`START_FAILED` si `start()` lève)
+- Handlers/tools enregistrés sur le bus (`MISSING_HANDLER`)
+- Tools appelables dans le runtime de validation (`TOOL_CALL_FAILED`)
+- Pas de leaks après `stop` (`HANDLER_LEAK`, `STOP_FAILED`)
 
-Lancé en CI sur chaque brique du marketplace officiel et utilisable par les développeurs tiers.
+Lancé en CI sur chaque brique du marketplace officiel et utilisable par les développeurs tiers. Des validations supplémentaires (conventions de namespace `brique:action`, correspondance dépendances↔appels effectifs, détection de bypass des garde-fous) sont planifiées en P1.
 
 ---
 
@@ -331,7 +331,7 @@ Au démarrage, le loader lit `center.json` + `center.lock`, charge dynamiquement
 
 ## Patterns d'optimisation des tokens (référence)
 
-Les patterns transverses applicables par toutes les briques. Implémentés dans des **briques officielles** publiées sur le marketplace (voir `marketplace/PRD.md`) :
+Les patterns transverses applicables par toutes les briques. Implémentés dans des **briques officielles** publiées sur le marketplace (voir le repo [`focus-mcp/marketplace`](https://github.com/focus-mcp/marketplace)) :
 
 - **Output filtering** — chaque brique retourne le résultat distillé, jamais la donnée brute
 - **Think in code** — sandbox JS éphémère (brique `focus-sandbox`)
@@ -351,7 +351,7 @@ Les patterns transverses applicables par toutes les briques. Implémentés dans 
 | Build | **tsup** | Bundling (ESM + types) |
 | Tests | **Vitest** | Unit + intégration |
 | Lint/Format | **Biome** | Style et qualité |
-| Manifeste | **JSON** + Zod | Validation stricte |
+| Manifeste | **JSON** + validateur custom (`parseManifest`) | Validation stricte ; JSON Schema utilisé uniquement pour `tools[].inputSchema` |
 | Logger | Browser-compatible (custom) | Pas de Pino (incompatible WebView) |
 | Tracing | Browser-compatible (custom) | Pas de `node:async_hooks` |
 
@@ -365,7 +365,7 @@ Les patterns transverses applicables par toutes les briques. Implémentés dans 
 | **Runtime** | WebView (browser-compatible) | Pas de sidecar Node.js, IPC direct |
 | **Communication briques** | EventBus in-process | Découplage + monitoring centralisé |
 | **Sécurité bus** | Whitelist via `dependencies` du manifeste | Permissions déclaratives, pas de config séparée |
-| **Manifeste** | JSON + JSON Schema | Lisible, validable, versionnable |
+| **Manifeste** | JSON + validateur custom (`parseManifest`) | Lisible, validable, versionnable ; JSON Schema réservé à `tools[].inputSchema` |
 | **Lock file** | `center.lock` (sha256) | Reproductibilité + intégrité |
 | **Briques** | Modules TS chargés dynamiquement | Hot-reload possible, simple |
 
