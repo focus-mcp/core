@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 FocusMCP contributors
+SPDX-License-Identifier: MIT
+-->
+
 # @focusmcp/core — Product Requirements Document
 
 > Périmètre de ce document : la **bibliothèque TypeScript** `@focusmcp/core` (package `packages/core` du monorepo).
