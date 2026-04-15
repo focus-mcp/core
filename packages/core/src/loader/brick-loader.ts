@@ -49,13 +49,12 @@ export async function loadBricks(options: BrickLoaderOptions): Promise<BrickLoad
 
   for (const name of names) {
     try {
-      const manifest = parseManifest(await source.readManifest(name));
+      const sourceManifest = parseManifest(await source.readManifest(name));
       const brick = extractBrick(await source.loadModule(name));
+      const moduleManifest = parseManifest(brick.manifest);
 
-      if (brick.manifest.name !== manifest.name) {
-        throw new Error(
-          `manifest name mismatch: source declared "${manifest.name}" but module brick is "${brick.manifest.name}"`,
-        );
+      if (canonicalize(sourceManifest) !== canonicalize(moduleManifest)) {
+        throw new Error(`manifest mismatch between source and module for "${sourceManifest.name}"`);
       }
 
       bricks.push(brick);
@@ -71,15 +70,30 @@ function extractBrick(module: unknown): Brick {
   if (!module || typeof module !== 'object') {
     throw new Error('module is not an object');
   }
-  const candidate = (module as { default?: unknown }).default;
-  if (!candidate || typeof candidate !== 'object') {
+  if (!('default' in module)) {
     throw new Error('module has no default export');
   }
+  const candidate = (module as { default: unknown }).default;
+  if (!candidate || typeof candidate !== 'object') {
+    throw new Error('module default export is not an object');
+  }
   const brick = candidate as Partial<Brick>;
-  if (!brick.manifest || typeof brick.start !== 'function' || typeof brick.stop !== 'function') {
+  if (typeof brick.start !== 'function' || typeof brick.stop !== 'function') {
     throw new Error('default export does not implement the Brick contract');
   }
   return brick as Brick;
+}
+
+/** Canonicalize a JSON-shaped value (sort object keys) for stable comparison. */
+function canonicalize(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) {
+    return `[${value.map(canonicalize).join(',')}]`;
+  }
+  const entries = Object.entries(value as Record<string, unknown>).sort(([a], [b]) =>
+    a.localeCompare(b),
+  );
+  return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalize(v)}`).join(',')}}`;
 }
 
 function toError(cause: unknown): Error {

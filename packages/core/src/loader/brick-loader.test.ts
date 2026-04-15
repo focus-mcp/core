@@ -117,13 +117,51 @@ describe('loadBricks', () => {
     expect(result.failures[0]?.error.message).toMatch(/mismatch/i);
   });
 
-  it('records a failure when module has no default export', async () => {
-    const source = makeSource([{ name: 'broken', module: {} }]);
+  it('records a failure when module manifest diverges from source manifest', async () => {
+    const source = makeSource([
+      {
+        name: 'indexer',
+        manifest: makeManifest('indexer', ['cache']),
+        module: { default: makeBrick(makeManifest('indexer', [])) },
+      },
+    ]);
+    const result = await loadBricks({ source });
+    expect(result.bricks).toEqual([]);
+    expect(result.failures).toHaveLength(1);
+    expect(result.failures[0]?.error.message).toMatch(/mismatch/i);
+  });
+
+  it('records a failure when module brick has malformed manifest', async () => {
+    const source = makeSource([
+      {
+        name: 'broken',
+        manifest: makeManifest('broken'),
+        module: {
+          default: { manifest: 'not-an-object', start() {}, stop() {} },
+        },
+      },
+    ]);
     const result = await loadBricks({ source });
     expect(result.bricks).toEqual([]);
     expect(result.failures).toHaveLength(1);
     expect(result.failures[0]?.name).toBe('broken');
-    expect(result.failures[0]?.error.message).toMatch(/default export/i);
+  });
+
+  it('records a failure when module has no default export', async () => {
+    const source = makeSource([{ name: 'broken', module: { other: 1 } }]);
+    const result = await loadBricks({ source });
+    expect(result.bricks).toEqual([]);
+    expect(result.failures).toHaveLength(1);
+    expect(result.failures[0]?.name).toBe('broken');
+    expect(result.failures[0]?.error.message).toMatch(/has no default export/i);
+  });
+
+  it('records a failure when default export is not an object (e.g. number)', async () => {
+    const source = makeSource([{ name: 'broken', module: { default: 42 } }]);
+    const result = await loadBricks({ source });
+    expect(result.bricks).toEqual([]);
+    expect(result.failures).toHaveLength(1);
+    expect(result.failures[0]?.error.message).toMatch(/default export is not an object/i);
   });
 
   it('records a failure when module is not an object (null)', async () => {
