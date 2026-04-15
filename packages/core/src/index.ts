@@ -12,6 +12,13 @@ export {
   InProcessEventBus,
 } from './event-bus/event-bus.ts';
 export {
+  type BrickLoaderOptions,
+  type BrickLoadFailure,
+  type BrickLoadResult,
+  type BrickSource,
+  loadBricks,
+} from './loader/brick-loader.ts';
+export {
   ManifestError,
   type ManifestErrorCode,
   parseManifest,
