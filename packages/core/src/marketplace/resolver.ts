@@ -74,28 +74,29 @@ export interface UpdateInfo {
 // ---------- Constants ----------
 
 const KEBAB_NAME = /^[a-z][a-z0-9-]*$/;
-// Semver 2.0 (core + optional pre-release; we ignore build metadata on purpose)
-const SEMVER_CORE =
-  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
+// SemVer 2.0 — strict pre-release (no leading-zero numeric identifiers) + optional build metadata.
+// Groups: 1=major, 2=minor, 3=patch, 4=pre-release (without the leading dash).
+const SEMVER =
+  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 
 // ---------- parseCatalog ----------
 
 export function parseCatalog(raw: unknown): Catalog {
   const obj = requireObject(raw, 'catalog');
-  const name = requireString(obj, 'name');
-  const owner = requireObject(obj['owner'], 'owner');
-  const ownerName = requireString(owner, 'name');
-  const updated = requireString(obj, 'updated');
+  const name = requireString(obj, 'name', 'catalog');
+  const owner = requireObject(obj['owner'], 'catalog.owner');
+  const ownerName = requireString(owner, 'name', 'catalog.owner');
+  const updated = requireString(obj, 'updated', 'catalog');
   const bricksRaw = obj['bricks'];
   if (!Array.isArray(bricksRaw)) {
     throw new Error('catalog.bricks must be an array');
   }
   const bricks = bricksRaw.map((b, i) => parseBrick(b, i));
 
-  const schema = optionalString(obj, '$schema');
-  const description = optionalString(obj, 'description');
-  const ownerUrl = optionalString(owner, 'url');
-  const ownerEmail = optionalString(owner, 'email');
+  const schema = optionalString(obj, '$schema', 'catalog');
+  const description = optionalString(obj, 'description', 'catalog');
+  const ownerUrl = optionalString(owner, 'url', 'catalog.owner');
+  const ownerEmail = optionalString(owner, 'email', 'catalog.owner');
 
   return {
     name,
@@ -112,26 +113,27 @@ export function parseCatalog(raw: unknown): Catalog {
 }
 
 function parseBrick(raw: unknown, index: number): CatalogBrick {
-  const obj = requireObject(raw, `bricks[${index}]`);
-  const name = requireString(obj, 'name');
+  const loc = `bricks[${index}]`;
+  const obj = requireObject(raw, loc);
+  const name = requireString(obj, 'name', loc);
   if (!KEBAB_NAME.test(name)) {
-    throw new Error(`bricks[${index}].name "${name}" is not kebab-case`);
+    throw new Error(`${loc}.name "${name}" is not kebab-case`);
   }
-  const version = requireString(obj, 'version');
-  if (!SEMVER_CORE.test(version)) {
-    throw new Error(`bricks[${index}].version "${version}" is not a valid semver`);
+  const version = requireString(obj, 'version', loc);
+  if (!SEMVER.test(version)) {
+    throw new Error(`${loc}.version "${version}" is not a valid semver`);
   }
-  const description = requireString(obj, 'description');
-  const dependencies = requireStringArray(obj, 'dependencies');
-  const tools = requireArray(obj, 'tools').map((t, ti) => parseTool(t, index, ti));
-  const source = parseSource(obj['source'], index);
-  const tags = optionalStringArray(obj, 'tags');
-  const tarballUrl = optionalString(obj, 'tarballUrl');
-  const integrity = optionalString(obj, 'integrity');
-  const publishedAt = optionalString(obj, 'publishedAt');
-  const license = optionalString(obj, 'license');
-  const homepage = optionalString(obj, 'homepage');
-  const publisher = optionalString(obj, 'publisher');
+  const description = requireString(obj, 'description', loc);
+  const dependencies = requireStringArray(obj, 'dependencies', loc);
+  const tools = requireArray(obj, 'tools', loc).map((t, ti) => parseTool(t, loc, ti));
+  const source = parseSource(obj['source'], loc);
+  const tags = optionalStringArray(obj, 'tags', loc);
+  const tarballUrl = optionalString(obj, 'tarballUrl', loc);
+  const integrity = optionalString(obj, 'integrity', loc);
+  const publishedAt = optionalString(obj, 'publishedAt', loc);
+  const license = optionalString(obj, 'license', loc);
+  const homepage = optionalString(obj, 'homepage', loc);
+  const publisher = optionalString(obj, 'publisher', loc);
 
   return {
     name,
@@ -150,38 +152,39 @@ function parseBrick(raw: unknown, index: number): CatalogBrick {
   };
 }
 
-function parseTool(raw: unknown, brickIndex: number, toolIndex: number): CatalogTool {
-  const loc = `bricks[${brickIndex}].tools[${toolIndex}]`;
+function parseTool(raw: unknown, parentLoc: string, toolIndex: number): CatalogTool {
+  const loc = `${parentLoc}.tools[${toolIndex}]`;
   const obj = requireObject(raw, loc);
+  const inputSchema = obj['inputSchema'];
   return {
-    name: requireString(obj, 'name'),
-    description: requireString(obj, 'description'),
-    inputSchema: obj['inputSchema'],
+    name: requireString(obj, 'name', loc),
+    description: requireString(obj, 'description', loc),
+    ...(inputSchema !== undefined ? { inputSchema } : {}),
   };
 }
 
-function parseSource(raw: unknown, brickIndex: number): CatalogBrickSource {
-  const loc = `bricks[${brickIndex}].source`;
+function parseSource(raw: unknown, parentLoc: string): CatalogBrickSource {
+  const loc = `${parentLoc}.source`;
   const obj = requireObject(raw, loc);
   const type = obj['type'];
   if (type === 'local') {
-    return { type: 'local', path: requireString(obj, 'path') };
+    return { type: 'local', path: requireString(obj, 'path', loc) };
   }
   if (type === 'url') {
-    const sha = optionalString(obj, 'sha');
+    const sha = optionalString(obj, 'sha', loc);
     return {
       type: 'url',
-      url: requireString(obj, 'url'),
+      url: requireString(obj, 'url', loc),
       ...(sha !== undefined ? { sha } : {}),
     };
   }
   if (type === 'git-subdir') {
-    const sha = optionalString(obj, 'sha');
+    const sha = optionalString(obj, 'sha', loc);
     return {
       type: 'git-subdir',
-      url: requireString(obj, 'url'),
-      path: requireString(obj, 'path'),
-      ref: requireString(obj, 'ref'),
+      url: requireString(obj, 'url', loc),
+      path: requireString(obj, 'path', loc),
+      ref: requireString(obj, 'ref', loc),
       ...(sha !== undefined ? { sha } : {}),
     };
   }
@@ -198,7 +201,7 @@ export function findBrick(catalog: Catalog, name: string): CatalogBrick | undefi
 
 // ---------- compareSemver ----------
 
-/** -1 if a < b, 0 if equal, 1 if a > b. Throws on malformed input. */
+/** -1 if a < b, 0 if equal, 1 if a > b. Throws on malformed input. Build metadata is ignored per SemVer 2.0 §10. */
 export function compareSemver(a: string, b: string): -1 | 0 | 1 {
   const pa = parseSemver(a);
   const pb = parseSemver(b);
@@ -220,7 +223,7 @@ function parseSemver(version: string): {
   readonly core: readonly [number, number, number];
   readonly pre: string | undefined;
 } {
-  const match = SEMVER_CORE.exec(version);
+  const match = SEMVER.exec(version);
   if (!match) throw new Error(`"${version}" is not a valid semver`);
   return {
     core: [Number(match[1]), Number(match[2]), Number(match[3])] as const,
@@ -283,33 +286,47 @@ function requireObject(raw: unknown, loc: string): Record<string, unknown> {
   return raw as Record<string, unknown>;
 }
 
-function requireString(obj: Record<string, unknown>, key: string): string {
+function requireString(obj: Record<string, unknown>, key: string, parentLoc: string): string {
   const value = obj[key];
   if (typeof value !== 'string' || value.length === 0) {
-    throw new Error(`${key} must be a non-empty string`);
+    throw new Error(`${parentLoc}.${key} must be a non-empty string`);
   }
   return value;
 }
 
-function optionalString(obj: Record<string, unknown>, key: string): string | undefined {
+function optionalString(
+  obj: Record<string, unknown>,
+  key: string,
+  parentLoc: string,
+): string | undefined {
   const value = obj[key];
   if (value === undefined) return undefined;
   if (typeof value !== 'string') {
-    throw new Error(`${key} must be a string when provided`);
+    throw new Error(`${parentLoc}.${key} must be a string when provided`);
   }
   return value;
 }
 
-function requireArray(obj: Record<string, unknown>, key: string): readonly unknown[] {
+function requireArray(
+  obj: Record<string, unknown>,
+  key: string,
+  parentLoc: string,
+): readonly unknown[] {
   const value = obj[key];
-  if (!Array.isArray(value)) throw new Error(`${key} must be an array`);
+  if (!Array.isArray(value)) throw new Error(`${parentLoc}.${key} must be an array`);
   return value;
 }
 
-function requireStringArray(obj: Record<string, unknown>, key: string): readonly string[] {
-  const arr = requireArray(obj, key);
+function requireStringArray(
+  obj: Record<string, unknown>,
+  key: string,
+  parentLoc: string,
+): readonly string[] {
+  const arr = requireArray(obj, key, parentLoc);
   for (const item of arr) {
-    if (typeof item !== 'string') throw new Error(`${key} must contain only strings`);
+    if (typeof item !== 'string') {
+      throw new Error(`${parentLoc}.${key} must contain only strings`);
+    }
   }
   return arr as readonly string[];
 }
@@ -317,8 +334,9 @@ function requireStringArray(obj: Record<string, unknown>, key: string): readonly
 function optionalStringArray(
   obj: Record<string, unknown>,
   key: string,
+  parentLoc: string,
 ): readonly string[] | undefined {
   const value = obj[key];
   if (value === undefined) return undefined;
-  return requireStringArray(obj, key);
+  return requireStringArray(obj, key, parentLoc);
 }

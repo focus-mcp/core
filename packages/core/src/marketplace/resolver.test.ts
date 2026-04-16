@@ -118,9 +118,17 @@ describe('compareSemver', () => {
     expect(compareSemver('1.0.0-alpha.1', '1.0.0-alpha.2')).toBe(-1);
   });
 
+  it('ignores build metadata when comparing versions', () => {
+    expect(compareSemver('1.0.0+build.1', '1.0.0+build.2')).toBe(0);
+    expect(compareSemver('1.0.0+build.1', '1.0.0')).toBe(0);
+    expect(compareSemver('1.0.0-alpha+x', '1.0.0-alpha+y')).toBe(0);
+  });
+
   it('throws on malformed input', () => {
     expect(() => compareSemver('not-semver', '1.0.0')).toThrow(/semver/i);
     expect(() => compareSemver('1.0', '1.0.0')).toThrow(/semver/i);
+    expect(() => compareSemver('1.0.0-alpha.01', '1.0.0-alpha.1')).toThrow(/semver/i);
+    expect(() => compareSemver('1.0.0-01', '1.0.0-1')).toThrow(/semver/i);
   });
 });
 
