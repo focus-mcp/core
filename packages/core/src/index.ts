@@ -23,6 +23,19 @@ export {
   type ManifestErrorCode,
   parseManifest,
 } from './manifest/manifest.ts';
+export {
+  type Catalog,
+  type CatalogBrick,
+  type CatalogBrickSource,
+  type CatalogOwner,
+  type CatalogTool,
+  compareSemver,
+  findBrick,
+  type InstalledBrick,
+  listUpdates,
+  parseCatalog,
+  type UpdateInfo,
+} from './marketplace/resolver.ts';
 export { createLogger, rootLogger } from './observability/logger.ts';
 export { getTracer, trace } from './observability/tracing.ts';
 export { permissionProviderFromRegistry } from './registry/permission-provider.ts';
