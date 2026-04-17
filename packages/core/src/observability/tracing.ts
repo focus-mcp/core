@@ -7,7 +7,7 @@ const TRACER_NAME = 'focusmcp';
 const TRACER_VERSION = '0.0.0';
 
 export function getTracer(): Tracer {
-  return trace.getTracer(TRACER_NAME, TRACER_VERSION);
+    return trace.getTracer(TRACER_NAME, TRACER_VERSION);
 }
 
 export { trace } from '@opentelemetry/api';

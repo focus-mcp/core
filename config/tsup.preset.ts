@@ -8,18 +8,18 @@ import type { Options } from 'tsup';
  * Build ESM-only, types, sourcemaps, target Node 22.
  */
 export function focusTsupPreset(overrides: Partial<Options> = {}): Options {
-  return {
-    entry: ['src/index.ts'],
-    format: ['esm'],
-    target: 'node22',
-    platform: 'node',
-    dts: true,
-    sourcemap: true,
-    clean: true,
-    splitting: false,
-    treeshake: true,
-    minify: false,
-    outDir: 'dist',
-    ...overrides,
-  };
+    return {
+        entry: ['src/index.ts'],
+        format: ['esm'],
+        target: 'node22',
+        platform: 'node',
+        dts: true,
+        sourcemap: true,
+        clean: true,
+        splitting: false,
+        treeshake: true,
+        minify: false,
+        outDir: 'dist',
+        ...overrides,
+    };
 }

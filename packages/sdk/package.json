@@ -1,37 +1,37 @@
 {
-  "name": "@focusmcp/sdk",
-  "version": "0.0.0",
-  "description": "FocusMCP SDK — outils et types pour développer une brique",
-  "license": "MIT",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "name": "@focusmcp/sdk",
+    "version": "0.0.0",
+    "description": "FocusMCP SDK — outils et types pour développer une brique",
+    "license": "MIT",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@focusmcp/core": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "^22.10.0",
+        "typescript": "^5.7.0",
+        "vitest": "^3.2.0"
+    },
+    "publishConfig": {
+        "access": "public",
+        "provenance": true
     }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "tsup",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
-  },
-  "dependencies": {
-    "@focusmcp/core": "workspace:*"
-  },
-  "devDependencies": {
-    "@types/node": "^22.10.0",
-    "typescript": "^5.7.0",
-    "vitest": "^3.2.0"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  }
 }
