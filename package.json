@@ -1,97 +1,97 @@
 {
-  "name": "@focusmcp/root",
-  "version": "0.0.0",
-  "private": true,
-  "description": "FocusMCP — Focaliser les agents AI sur l'essentiel",
-  "license": "MIT",
-  "type": "module",
-  "engines": {
-    "node": ">=22.0.0",
-    "pnpm": ">=10.0.0"
-  },
-  "packageManager": "pnpm@10.32.1",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/focus-mcp/core.git"
-  },
-  "homepage": "https://focusmcp.dev",
-  "bugs": {
-    "url": "https://github.com/focus-mcp/core/issues"
-  },
-  "scripts": {
-    "build": "pnpm -r --filter \"./packages/**\" build",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
-    "typecheck": "pnpm -r typecheck",
-    "test": "vitest run --config config/vitest.config.ts",
-    "test:watch": "vitest --config config/vitest.config.ts",
-    "test:coverage": "vitest run --coverage --config config/vitest.config.ts",
-    "test:mutation": "stryker run config/stryker.config.json",
-    "test:e2e": "playwright test --config config/playwright.config.ts",
-    "knip": "knip --config config/knip.json",
-    "size": "size-limit",
-    "jscpd": "jscpd --config config/jscpd.json .",
-    "license-check": "license-checker --production --onlyAllow \"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD;Unlicense;CC0-1.0\"",
-    "audit": "pnpm audit --prod",
-    "reuse": "reuse lint",
-    "sbom": "cdxgen -o sbom.json -t js --no-install-deps",
-    "changeset": "changeset",
-    "version": "changeset version",
-    "release": "changeset publish",
-    "prepare": "husky"
-  },
-  "size-limit": [
-    {
-      "name": "@focusmcp/core (gzip)",
-      "path": "packages/core/dist/index.js",
-      "limit": "30 KB",
-      "gzip": true
+    "name": "@focusmcp/root",
+    "version": "0.0.0",
+    "private": true,
+    "description": "FocusMCP — Focaliser les agents AI sur l'essentiel",
+    "license": "MIT",
+    "type": "module",
+    "engines": {
+        "node": ">=22.0.0",
+        "pnpm": ">=10.0.0"
     },
-    {
-      "name": "@focusmcp/sdk (gzip)",
-      "path": "packages/sdk/dist/index.js",
-      "limit": "10 KB",
-      "gzip": true
+    "packageManager": "pnpm@10.32.1",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/focus-mcp/core.git"
     },
-    {
-      "name": "@focusmcp/cli (gzip)",
-      "path": "packages/cli/dist/index.js",
-      "limit": "50 KB",
-      "gzip": true
+    "homepage": "https://focusmcp.dev",
+    "bugs": {
+        "url": "https://github.com/focus-mcp/core/issues"
+    },
+    "scripts": {
+        "build": "pnpm -r --filter \"./packages/**\" build",
+        "lint": "biome check .",
+        "lint:fix": "biome check --write .",
+        "format": "biome format --write .",
+        "typecheck": "pnpm -r typecheck",
+        "test": "vitest run --config config/vitest.config.ts",
+        "test:watch": "vitest --config config/vitest.config.ts",
+        "test:coverage": "vitest run --coverage --config config/vitest.config.ts",
+        "test:mutation": "stryker run config/stryker.config.json",
+        "test:e2e": "playwright test --config config/playwright.config.ts",
+        "knip": "knip --config config/knip.json",
+        "size": "size-limit",
+        "jscpd": "jscpd --config config/jscpd.json .",
+        "license-check": "license-checker --production --onlyAllow \"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD;Unlicense;CC0-1.0\"",
+        "audit": "pnpm audit --prod",
+        "reuse": "reuse lint",
+        "sbom": "cdxgen -o sbom.json -t js --no-install-deps",
+        "changeset": "changeset",
+        "version": "changeset version",
+        "release": "changeset publish",
+        "prepare": "husky"
+    },
+    "size-limit": [
+        {
+            "name": "@focusmcp/core (gzip)",
+            "path": "packages/core/dist/index.js",
+            "limit": "30 KB",
+            "gzip": true
+        },
+        {
+            "name": "@focusmcp/sdk (gzip)",
+            "path": "packages/sdk/dist/index.js",
+            "limit": "10 KB",
+            "gzip": true
+        },
+        {
+            "name": "@focusmcp/cli (gzip)",
+            "path": "packages/cli/dist/index.js",
+            "limit": "50 KB",
+            "gzip": true
+        }
+    ],
+    "devDependencies": {
+        "@biomejs/biome": "^2.2.0",
+        "@changesets/cli": "^2.27.0",
+        "@commitlint/cli": "^19.6.0",
+        "@commitlint/config-conventional": "^19.6.0",
+        "@commitlint/types": "^19.8.1",
+        "@cyclonedx/cdxgen": "^11.0.0",
+        "@playwright/test": "^1.59.1",
+        "@size-limit/preset-small-lib": "^12.1.0",
+        "@stryker-mutator/core": "^9.0.0",
+        "@stryker-mutator/vitest-runner": "^9.0.0",
+        "@types/node": "^22.10.0",
+        "@vitest/coverage-v8": "^3.2.0",
+        "fast-check": "^3.23.0",
+        "husky": "^9.1.0",
+        "jscpd": "^4.0.5",
+        "knip": "^5.40.0",
+        "license-checker": "^25.0.1",
+        "lint-staged": "^15.2.0",
+        "size-limit": "^11.1.0",
+        "tsup": "^8.3.0",
+        "typescript": "^5.7.0",
+        "vitest": "^3.2.0"
+    },
+    "pnpm": {
+        "overrides": {
+            "tar": "^7.5.13",
+            "glob": "^10.4.5",
+            "minimatch": "^9.0.5",
+            "jws": "^4.0.1",
+            "sequelize": "^6.37.8"
+        }
     }
-  ],
-  "devDependencies": {
-    "@biomejs/biome": "^2.2.0",
-    "@changesets/cli": "^2.27.0",
-    "@commitlint/cli": "^19.6.0",
-    "@commitlint/config-conventional": "^19.6.0",
-    "@commitlint/types": "^19.8.1",
-    "@cyclonedx/cdxgen": "^11.0.0",
-    "@playwright/test": "^1.59.1",
-    "@size-limit/preset-small-lib": "^12.1.0",
-    "@stryker-mutator/core": "^9.0.0",
-    "@stryker-mutator/vitest-runner": "^9.0.0",
-    "@types/node": "^22.10.0",
-    "@vitest/coverage-v8": "^3.2.0",
-    "fast-check": "^3.23.0",
-    "husky": "^9.1.0",
-    "jscpd": "^4.0.5",
-    "knip": "^5.40.0",
-    "license-checker": "^25.0.1",
-    "lint-staged": "^15.2.0",
-    "size-limit": "^11.1.0",
-    "tsup": "^8.3.0",
-    "typescript": "^5.7.0",
-    "vitest": "^3.2.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "tar": "^7.5.13",
-      "glob": "^10.4.5",
-      "minimatch": "^9.0.5",
-      "jws": "^4.0.1",
-      "sequelize": "^6.37.8"
-    }
-  }
 }

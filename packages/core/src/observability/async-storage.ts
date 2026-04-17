@@ -13,19 +13,19 @@
  * (proposal TC39 stage 3) quand shipped.
  */
 export class AsyncLocalStorage<T> {
-  #store: T | undefined;
+    #store: T | undefined;
 
-  getStore(): T | undefined {
-    return this.#store;
-  }
-
-  run<R>(store: T, fn: () => R): R {
-    const prev = this.#store;
-    this.#store = store;
-    try {
-      return fn();
-    } finally {
-      this.#store = prev;
+    getStore(): T | undefined {
+        return this.#store;
     }
-  }
+
+    run<R>(store: T, fn: () => R): R {
+        const prev = this.#store;
+        this.#store = store;
+        try {
+            return fn();
+        } finally {
+            this.#store = prev;
+        }
+    }
 }

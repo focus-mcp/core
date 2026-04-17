@@ -12,18 +12,18 @@ import type { Registry } from '../types/registry.ts';
 import type { Router } from '../types/router.ts';
 
 export interface CreateFocusMcpOptions {
-  /** Briques à enregistrer au démarrage (l'ordre de démarrage suit les dépendances). */
-  readonly bricks?: readonly Brick[];
-  /** Garde-fous EventBus. Par défaut : `DEFAULT_GUARDS`. */
-  readonly guards?: EventBusGuards;
+    /** Briques à enregistrer au démarrage (l'ordre de démarrage suit les dépendances). */
+    readonly bricks?: readonly Brick[];
+    /** Garde-fous EventBus. Par défaut : `DEFAULT_GUARDS`. */
+    readonly guards?: EventBusGuards;
 }
 
 export interface FocusMcp {
-  readonly registry: Registry;
-  readonly bus: EventBus;
-  readonly router: Router;
-  start(): Promise<void>;
-  stop(): Promise<void>;
+    readonly registry: Registry;
+    readonly bus: EventBus;
+    readonly router: Router;
+    start(): Promise<void>;
+    stop(): Promise<void>;
 }
 
 /**
@@ -37,93 +37,93 @@ export interface FocusMcp {
  * `stop()` les arrête dans l'ordre inverse.
  */
 export function createFocusMcp(options: CreateFocusMcpOptions = {}): FocusMcp {
-  const registry = new InMemoryRegistry();
-  for (const brick of options.bricks ?? []) {
-    registry.register(brick);
-  }
+    const registry = new InMemoryRegistry();
+    for (const brick of options.bricks ?? []) {
+        registry.register(brick);
+    }
 
-  const permissionProvider = permissionProviderFromRegistry(registry);
-  const bus = options.guards
-    ? new InProcessEventBus(options.guards, { permissionProvider })
-    : new InProcessEventBus(undefined, { permissionProvider });
+    const permissionProvider = permissionProviderFromRegistry(registry);
+    const bus = options.guards
+        ? new InProcessEventBus(options.guards, { permissionProvider })
+        : new InProcessEventBus(undefined, { permissionProvider });
 
-  const router = new McpRouter({ registry, bus });
+    const router = new McpRouter({ registry, bus });
 
-  let startedBricks: Brick[] = [];
-  let started = false;
+    let startedBricks: Brick[] = [];
+    let started = false;
 
-  return {
-    registry,
-    bus,
-    router,
+    return {
+        registry,
+        bus,
+        router,
 
-    async start(): Promise<void> {
-      if (started) throw new Error('FocusMcp already started');
-      started = true;
+        async start(): Promise<void> {
+            if (started) throw new Error('FocusMcp already started');
+            started = true;
 
-      startedBricks = [];
-      const order = resolveStartOrder(registry);
-      for (const brick of order) {
-        const ctx = buildCtx(bus, brick.manifest.name);
-        registry.setStatus(brick.manifest.name, 'starting');
-        try {
-          await brick.start(ctx);
-          registry.setStatus(brick.manifest.name, 'running');
-          startedBricks.push(brick);
-        } catch (err) {
-          registry.setStatus(brick.manifest.name, 'error');
-          await rollbackStartedBricks(startedBricks, registry);
-          started = false;
-          throw err;
-        }
-      }
-    },
+            startedBricks = [];
+            const order = resolveStartOrder(registry);
+            for (const brick of order) {
+                const ctx = buildCtx(bus, brick.manifest.name);
+                registry.setStatus(brick.manifest.name, 'starting');
+                try {
+                    await brick.start(ctx);
+                    registry.setStatus(brick.manifest.name, 'running');
+                    startedBricks.push(brick);
+                } catch (err) {
+                    registry.setStatus(brick.manifest.name, 'error');
+                    await rollbackStartedBricks(startedBricks, registry);
+                    started = false;
+                    throw err;
+                }
+            }
+        },
 
-    async stop(): Promise<void> {
-      if (!started) return;
-      for (const brick of [...startedBricks].reverse()) {
-        try {
-          await brick.stop();
-        } catch (err) {
-          createLogger('bootstrap').error('brick stop failed', {
-            brick: brick.manifest.name,
-            err: err instanceof Error ? err.message : String(err),
-          });
-        }
-        registry.setStatus(brick.manifest.name, 'stopped');
-      }
-      startedBricks = [];
-      started = false;
-    },
-  };
+        async stop(): Promise<void> {
+            if (!started) return;
+            for (const brick of [...startedBricks].reverse()) {
+                try {
+                    await brick.stop();
+                } catch (err) {
+                    createLogger('bootstrap').error('brick stop failed', {
+                        brick: brick.manifest.name,
+                        err: err instanceof Error ? err.message : String(err),
+                    });
+                }
+                registry.setStatus(brick.manifest.name, 'stopped');
+            }
+            startedBricks = [];
+            started = false;
+        },
+    };
 }
 
 function resolveStartOrder(registry: Registry): readonly Brick[] {
-  const order: Brick[] = [];
-  const seen = new Set<string>();
-  for (const brick of registry.getBricks()) {
-    for (const dep of registry.resolve(brick.manifest.name)) {
-      if (seen.has(dep.manifest.name)) continue;
-      seen.add(dep.manifest.name);
-      order.push(dep);
+    const order: Brick[] = [];
+    const seen = new Set<string>();
+    for (const brick of registry.getBricks()) {
+        for (const dep of registry.resolve(brick.manifest.name)) {
+            if (seen.has(dep.manifest.name)) continue;
+            seen.add(dep.manifest.name);
+            order.push(dep);
+        }
     }
-  }
-  return order;
+    return order;
 }
 
 async function rollbackStartedBricks(startedBricks: Brick[], registry: Registry): Promise<void> {
-  for (const brick of [...startedBricks].reverse()) {
-    try {
-      await brick.stop();
-    } catch {
-      /* ignore rollback errors */
+    for (const brick of [...startedBricks].reverse()) {
+        try {
+            await brick.stop();
+        } catch {
+            /* ignore rollback errors */
+        }
+        registry.setStatus(brick.manifest.name, 'stopped');
     }
-    registry.setStatus(brick.manifest.name, 'stopped');
-  }
-  startedBricks.length = 0;
+    startedBricks.length = 0;
 }
 
 function buildCtx(bus: EventBus, brickName: string): BrickContext {
-  const logger: BrickLogger = createLogger('brick', { brick: brickName });
-  return { bus, config: {}, logger };
+    const logger: BrickLogger = createLogger('brick', { brick: brickName });
+    return { bus, config: {}, logger };
 }
