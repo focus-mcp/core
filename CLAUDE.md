@@ -18,7 +18,7 @@ SPDX-License-Identifier: MIT
 Ce repo héberge la **bibliothèque `@focusmcp/core`** (Registry + EventBus + Router + SDK +
 Validator + marketplace resolver) importée par le CLI.
 
-## Écosystème (4 repos actifs + 1 archivé)
+## Écosystème (3 repos actifs + 1 archivé)
 
 | Repo | Statut | Rôle |
 |---|---|---|
@@ -56,13 +56,19 @@ héberge tout, mais l'architecture reste browser-compatible pour un futur Phase 
    Commits (enforced via commitlint), husky + lint-staged, semver, SPDX headers (REUSE),
    ADRs pour les décisions archi.
 4. **Imports** : toujours `node:` protocol (`import … from 'node:fs/promises'`).
-5. **Public-facing content en anglais** :
+5. **Public-facing content en anglais** — règle "à partir de maintenant" : tout **nouveau**
+   contenu public, et toute **mise à jour substantielle** d'un contenu public existant, est
+   rédigé en anglais. Périmètre :
    - `.github/` (workflows YAML, PR template, issue templates, renovate)
    - Titres + descriptions de PR, commentaires de PR, messages de commit
    - Titres + descriptions d'issues
    - Marketplace : `mcp-brick.json` description/tools, `bricks/<name>/README.md`, entries Changesets
-   - Docs contributor-facing : `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`
-   - Seule exception : `PRD.md` reste en français (doc stratégique interne).
+   - Docs contributor-facing cibles : `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `SECURITY.md`,
+     `CODE_OF_CONDUCT.md`
+   - Exception transitoire : les versions **existantes** de ces docs peuvent rester majoritairement
+     en français jusqu'à leur prochaine réécriture substantielle.
+   - Exceptions permanentes : `PRD.md` (doc stratégique interne) et `CLAUDE.md` (ce fichier, guide
+     d'agent interne) restent en français.
 6. **Git-flow strict** — `develop` est **permanente**, jamais `--delete-branch` sur une PR
    `develop → main`. Feature branches éphémères (`feat/*`, `fix/*`, `docs/*`, etc.),
    auto-delete après merge.
