@@ -9,10 +9,13 @@ import type { BrickManifest } from '../types/manifest.ts';
 import type { ToolResult } from '../types/tool.ts';
 import { McpRouter } from './router.ts';
 
+let _prefixCounter = 0;
 function fakeBrick(manifest: Partial<BrickManifest> & Pick<BrickManifest, 'name'>): Brick {
+    const defaultPrefix = manifest.prefix ?? `b${++_prefixCounter}`;
     return {
         manifest: {
             version: '1.0.0',
+            prefix: defaultPrefix,
             description: '',
             dependencies: [],
             tools: [],
@@ -35,15 +38,16 @@ function setupRouter(): {
 }
 
 describe('McpRouter — listTools', () => {
-    it('agrège les tools de toutes les briques running (via Registry)', () => {
+    it('agrège les tools de toutes les briques running avec noms préfixés', () => {
         const { router, registry } = setupRouter();
 
         registry.register(
             fakeBrick({
                 name: 'indexer',
+                prefix: 'idx',
                 tools: [
                     {
-                        name: 'indexer_search',
+                        name: 'search',
                         description: 'search',
                         inputSchema: { type: 'object' },
                     },
@@ -54,7 +58,7 @@ describe('McpRouter — listTools', () => {
 
         const tools = router.listTools().map((t) => t.name);
 
-        expect(tools).toEqual(['indexer_search']);
+        expect(tools).toEqual(['idx_search']);
     });
 
     it('ne retourne pas les tools de briques non-running', () => {
@@ -63,9 +67,10 @@ describe('McpRouter — listTools', () => {
         registry.register(
             fakeBrick({
                 name: 'indexer',
+                prefix: 'idx',
                 tools: [
                     {
-                        name: 'indexer_search',
+                        name: 'search',
                         description: 'search',
                         inputSchema: { type: 'object' },
                     },
@@ -78,15 +83,16 @@ describe('McpRouter — listTools', () => {
 });
 
 describe('McpRouter — callTool', () => {
-    it("dispatch l'appel vers la brique propriétaire via l'EventBus (target brick:tool)", async () => {
+    it("dispatch l'appel vers la brique propriétaire via l'EventBus avec le nom original (brick:toolName)", async () => {
         const { router, registry, bus } = setupRouter();
 
         registry.register(
             fakeBrick({
                 name: 'indexer',
+                prefix: 'idx',
                 tools: [
                     {
-                        name: 'indexer_search',
+                        name: 'search',
                         description: 'search',
                         inputSchema: { type: 'object' },
                     },
@@ -96,9 +102,9 @@ describe('McpRouter — callTool', () => {
         registry.setStatus('indexer', 'running');
 
         const expected: ToolResult = { content: [{ type: 'text', text: 'ok' }] };
-        bus.handle('indexer:indexer_search', () => expected);
+        bus.handle('indexer:search', () => expected);
 
-        const result = await router.callTool('indexer_search', { pattern: '*.ts' });
+        const result = await router.callTool('idx_search', { pattern: '*.ts' });
 
         expect(result).toBe(expected);
     });
@@ -109,9 +115,10 @@ describe('McpRouter — callTool', () => {
         registry.register(
             fakeBrick({
                 name: 'indexer',
+                prefix: 'idx',
                 tools: [
                     {
-                        name: 'indexer_search',
+                        name: 'search',
                         description: 'search',
                         inputSchema: { type: 'object' },
                     },
@@ -121,12 +128,12 @@ describe('McpRouter — callTool', () => {
         registry.setStatus('indexer', 'running');
 
         let captured: unknown;
-        bus.handle('indexer:indexer_search', (args) => {
+        bus.handle('indexer:search', (args) => {
             captured = args;
             return { content: [] };
         });
 
-        await router.callTool('indexer_search', { pattern: '*.ts' });
+        await router.callTool('idx_search', { pattern: '*.ts' });
 
         expect(captured).toEqual({ pattern: '*.ts' });
     });
@@ -146,9 +153,10 @@ describe('McpRouter — callTool', () => {
         registry.register(
             fakeBrick({
                 name: 'indexer',
+                prefix: 'idx',
                 tools: [
                     {
-                        name: 'indexer_search',
+                        name: 'search',
                         description: 'search',
                         inputSchema: { type: 'object' },
                     },
@@ -157,7 +165,7 @@ describe('McpRouter — callTool', () => {
         );
         // pas de setStatus('running')
 
-        await expect(router.callTool('indexer_search', {})).rejects.toMatchObject({
+        await expect(router.callTool('idx_search', {})).rejects.toMatchObject({
             name: 'RouterError',
             code: 'BRICK_NOT_RUNNING',
         });
