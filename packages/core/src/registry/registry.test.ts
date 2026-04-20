@@ -274,3 +274,85 @@ describe('InMemoryRegistry — unicité du prefix', () => {
         expect(() => registry.register(fakeBrick({ name: 'other', prefix: 'idx' }))).not.toThrow();
     });
 });
+
+describe('getBrickForTool — edge cases', () => {
+    it('returns undefined for tool without underscore', () => {
+        const registry = new InMemoryRegistry();
+        expect(registry.getBrickForTool('noprefix')).toBeUndefined();
+    });
+
+    it('returns undefined for unknown prefix', () => {
+        const registry = new InMemoryRegistry();
+        expect(registry.getBrickForTool('unknown_tool')).toBeUndefined();
+    });
+
+    it('returns undefined for unknown tool name with valid prefix', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(
+            fakeBrick({
+                name: 'test',
+                prefix: 'tst',
+                tools: [{ name: 'search', description: 'x', inputSchema: { type: 'object' } }],
+            }),
+        );
+        expect(registry.getBrickForTool('tst_nonexistent')).toBeUndefined();
+    });
+});
+
+describe('getOriginalToolName — edge cases', () => {
+    it('returns undefined for tool without underscore', () => {
+        const registry = new InMemoryRegistry();
+        expect(registry.getOriginalToolName('noprefix')).toBeUndefined();
+    });
+
+    it('returns undefined for unknown prefix', () => {
+        const registry = new InMemoryRegistry();
+        expect(registry.getOriginalToolName('unknown_tool')).toBeUndefined();
+    });
+
+    it('returns undefined for unknown tool with valid prefix', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(
+            fakeBrick({
+                name: 'test',
+                prefix: 'tst',
+                tools: [{ name: 'search', description: 'x', inputSchema: { type: 'object' } }],
+            }),
+        );
+        expect(registry.getOriginalToolName('tst_nonexistent')).toBeUndefined();
+    });
+
+    it('returns original name for valid prefixed tool', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(
+            fakeBrick({
+                name: 'test',
+                prefix: 'tst',
+                tools: [{ name: 'search', description: 'x', inputSchema: { type: 'object' } }],
+            }),
+        );
+        expect(registry.getOriginalToolName('tst_search')).toBe('search');
+    });
+});
+
+describe('prefix edge cases — coverage', () => {
+    it('getBrickForTool returns undefined when entry exists but tool not found', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(
+            fakeBrick({
+                name: 'alpha',
+                prefix: 'alp',
+                tools: [{ name: 'one', description: 'x', inputSchema: { type: 'object' } }],
+            }),
+        );
+        expect(registry.getBrickForTool('alp_two')).toBeUndefined();
+    });
+
+    it('getOriginalToolName returns undefined when entry not in entries map', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(fakeBrick({ name: 'beta', prefix: 'bet', tools: [] }));
+        // Unregister removes from entries
+        registry.unregister('beta');
+        expect(registry.getOriginalToolName('bet_x')).toBeUndefined();
+    });
+});

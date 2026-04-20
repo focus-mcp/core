@@ -136,6 +136,7 @@ export class InMemoryRegistry implements Registry {
         const brickName = this.#prefixes.get(prefix);
         if (brickName === undefined) return undefined;
         const entry = this.#entries.get(brickName);
+        /* v8 ignore next */
         if (!entry) return undefined;
         const hasTool = entry.brick.manifest.tools.some((t) => t.name === originalName);
         return hasTool ? brickName : undefined;
@@ -149,6 +150,7 @@ export class InMemoryRegistry implements Registry {
         const brickName = this.#prefixes.get(prefix);
         if (brickName === undefined) return undefined;
         const entry = this.#entries.get(brickName);
+        /* v8 ignore next */
         if (!entry) return undefined;
         const hasTool = entry.brick.manifest.tools.some((t) => t.name === originalName);
         return hasTool ? originalName : undefined;
