@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 export {
-  BrickDefinitionError,
-  type BrickDefinitionErrorCode,
-  type BrickToolHandler,
-  type DefineBrickOptions,
-  defineBrick,
+    BrickDefinitionError,
+    type BrickDefinitionErrorCode,
+    type BrickToolHandler,
+    type DefineBrickOptions,
+    defineBrick,
 } from './define-brick.ts';

@@ -1,17 +1,17 @@
 {
-  "threshold": 1.0,
-  "minTokens": 70,
-  "minLines": 8,
-  "ignore": [
-    "**/node_modules/**",
-    "**/dist/**",
-    "**/coverage/**",
-    "**/.stryker-tmp/**",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-  ],
-  "format": ["typescript", "javascript"],
-  "reporters": ["console", "html"],
-  "output": "../reports/jscpd",
-  "absolute": true
+    "threshold": 1.0,
+    "minTokens": 70,
+    "minLines": 8,
+    "ignore": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/coverage/**",
+        "**/.stryker-tmp/**",
+        "**/*.test.ts",
+        "**/*.spec.ts"
+    ],
+    "format": ["typescript", "javascript"],
+    "reporters": ["console", "html"],
+    "output": "../reports/jscpd",
+    "absolute": true
 }

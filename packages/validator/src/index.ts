@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 export {
-  type ValidateBrickOptions,
-  type ValidationIssue,
-  type ValidationIssueCode,
-  type ValidationReport,
-  validateBrick,
+    type ValidateBrickOptions,
+    type ValidationIssue,
+    type ValidationIssueCode,
+    type ValidationReport,
+    validateBrick,
 } from './validate-brick.ts';

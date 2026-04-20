@@ -1,29 +1,35 @@
 {
-  "name": "@focusmcp/cli",
-  "version": "0.0.0",
-  "description": "FocusMCP CLI — focus start, add, remove, update...",
-  "license": "MIT",
-  "type": "module",
-  "bin": {
-    "focus": "./dist/bin/focus.js"
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "tsup",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
-  },
-  "devDependencies": {
-    "@types/node": "^22.10.0",
-    "typescript": "^5.7.0",
-    "vitest": "^3.2.0"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  }
+    "name": "@focusmcp/cli",
+    "version": "0.0.0",
+    "description": "FocusMCP CLI — focus start, add, remove, update...",
+    "license": "MIT",
+    "type": "module",
+    "bin": {
+        "focus": "./dist/bin/focus.js"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "devDependencies": {
+        "@types/node": "^22.10.0",
+        "typescript": "^5.7.0",
+        "vitest": "^3.2.0"
+    },
+    "publishConfig": {
+        "access": "public",
+        "provenance": true,
+        "registry": "https://npm.pkg.github.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/focus-mcp/core.git",
+        "directory": "packages/cli"
+    }
 }

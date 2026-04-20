@@ -8,7 +8,7 @@ import type { Registry } from '../types/registry.ts';
  * Lit les dépendances déclarées dans le manifeste de chaque brique, en live.
  */
 export function permissionProviderFromRegistry(
-  registry: Registry,
+    registry: Registry,
 ): (source: string) => readonly string[] {
-  return (source) => registry.getBrick(source)?.manifest.dependencies ?? [];
+    return (source) => registry.getBrick(source)?.manifest.dependencies ?? [];
 }

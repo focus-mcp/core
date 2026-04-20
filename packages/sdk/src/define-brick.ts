@@ -2,36 +2,36 @@
 // SPDX-License-Identifier: MIT
 
 import {
-  type Brick,
-  type BrickContext,
-  type BrickManifest,
-  parseManifest,
-  type Unsubscribe,
+    type Brick,
+    type BrickContext,
+    type BrickManifest,
+    parseManifest,
+    type Unsubscribe,
 } from '@focusmcp/core';
 
 export type BrickDefinitionErrorCode = 'MISSING_HANDLER' | 'UNKNOWN_HANDLER' | 'ALREADY_STARTED';
 
 export class BrickDefinitionError extends Error {
-  constructor(
-    message: string,
-    public readonly code: BrickDefinitionErrorCode,
-    public readonly meta?: Record<string, unknown>,
-  ) {
-    super(message);
-    this.name = 'BrickDefinitionError';
-  }
+    constructor(
+        message: string,
+        public readonly code: BrickDefinitionErrorCode,
+        public readonly meta?: Record<string, unknown>,
+    ) {
+        super(message);
+        this.name = 'BrickDefinitionError';
+    }
 }
 
 export type BrickToolHandler<TPayload = unknown, TResult = unknown> = (
-  payload: TPayload,
-  ctx: BrickContext,
+    payload: TPayload,
+    ctx: BrickContext,
 ) => TResult | Promise<TResult>;
 
 export interface DefineBrickOptions {
-  /** Manifeste déclaratif de la brique (validé via parseManifest). */
-  readonly manifest: unknown;
-  /** Map tool → handler. La clé doit correspondre à un tool.name du manifeste. */
-  readonly handlers: Readonly<Record<string, BrickToolHandler>>;
+    /** Manifeste déclaratif de la brique (validé via parseManifest). */
+    readonly manifest: unknown;
+    /** Map tool → handler. La clé doit correspondre à un tool.name du manifeste. */
+    readonly handlers: Readonly<Record<string, BrickToolHandler>>;
 }
 
 /**
@@ -43,65 +43,65 @@ export interface DefineBrickOptions {
  * - À `stop()`, désenregistre tous les handlers
  */
 export function defineBrick(options: DefineBrickOptions): Brick {
-  const manifest = parseManifest(options.manifest);
-  assertHandlersMatchTools(manifest, options.handlers);
+    const manifest = parseManifest(options.manifest);
+    assertHandlersMatchTools(manifest, options.handlers);
 
-  let currentCtx: BrickContext | undefined;
-  let unsubscribes: Unsubscribe[] = [];
+    let currentCtx: BrickContext | undefined;
+    let unsubscribes: Unsubscribe[] = [];
 
-  return {
-    manifest,
+    return {
+        manifest,
 
-    start(ctx: BrickContext): void {
-      if (currentCtx !== undefined) {
-        throw new BrickDefinitionError(
-          `Brick "${manifest.name}" is already started`,
-          'ALREADY_STARTED',
-          { brick: manifest.name },
-        );
-      }
-      currentCtx = ctx;
-      unsubscribes = [];
-      for (const tool of manifest.tools) {
-        const handler = options.handlers[tool.name];
-        // Déjà vérifié par assertHandlersMatchTools — cast sûr.
-        const bound = handler as BrickToolHandler;
-        const unsub = ctx.bus.handle(`${manifest.name}:${tool.name}`, (payload) =>
-          bound(payload, ctx),
-        );
-        unsubscribes.push(unsub);
-      }
-    },
+        start(ctx: BrickContext): void {
+            if (currentCtx !== undefined) {
+                throw new BrickDefinitionError(
+                    `Brick "${manifest.name}" is already started`,
+                    'ALREADY_STARTED',
+                    { brick: manifest.name },
+                );
+            }
+            currentCtx = ctx;
+            unsubscribes = [];
+            for (const tool of manifest.tools) {
+                const handler = options.handlers[tool.name];
+                // Déjà vérifié par assertHandlersMatchTools — cast sûr.
+                const bound = handler as BrickToolHandler;
+                const unsub = ctx.bus.handle(`${manifest.name}:${tool.name}`, (payload) =>
+                    bound(payload, ctx),
+                );
+                unsubscribes.push(unsub);
+            }
+        },
 
-    stop(): void {
-      for (const unsub of unsubscribes) unsub();
-      unsubscribes = [];
-      currentCtx = undefined;
-    },
-  };
+        stop(): void {
+            for (const unsub of unsubscribes) unsub();
+            unsubscribes = [];
+            currentCtx = undefined;
+        },
+    };
 }
 
 function assertHandlersMatchTools(
-  manifest: BrickManifest,
-  handlers: Readonly<Record<string, BrickToolHandler>>,
+    manifest: BrickManifest,
+    handlers: Readonly<Record<string, BrickToolHandler>>,
 ): void {
-  const toolNames = new Set(manifest.tools.map((t) => t.name));
-  for (const tool of manifest.tools) {
-    if (!(tool.name in handlers)) {
-      throw new BrickDefinitionError(
-        `Brick "${manifest.name}" declares tool "${tool.name}" but no handler is provided`,
-        'MISSING_HANDLER',
-        { brick: manifest.name, tool: tool.name },
-      );
+    const toolNames = new Set(manifest.tools.map((t) => t.name));
+    for (const tool of manifest.tools) {
+        if (!(tool.name in handlers)) {
+            throw new BrickDefinitionError(
+                `Brick "${manifest.name}" declares tool "${tool.name}" but no handler is provided`,
+                'MISSING_HANDLER',
+                { brick: manifest.name, tool: tool.name },
+            );
+        }
     }
-  }
-  for (const handlerName of Object.keys(handlers)) {
-    if (!toolNames.has(handlerName)) {
-      throw new BrickDefinitionError(
-        `Brick "${manifest.name}" provides handler "${handlerName}" but no such tool is declared in the manifest`,
-        'UNKNOWN_HANDLER',
-        { brick: manifest.name, handler: handlerName },
-      );
+    for (const handlerName of Object.keys(handlers)) {
+        if (!toolNames.has(handlerName)) {
+            throw new BrickDefinitionError(
+                `Brick "${manifest.name}" provides handler "${handlerName}" but no such tool is declared in the manifest`,
+                'UNKNOWN_HANDLER',
+                { brick: manifest.name, handler: handlerName },
+            );
+        }
     }
-  }
 }
