@@ -8,7 +8,14 @@ import { InMemoryRegistry } from './registry.ts';
 
 function makeBrick(name: string, dependencies: readonly string[]): Brick {
     return {
-        manifest: { name, version: '1.0.0', description: `${name}`, dependencies, tools: [] },
+        manifest: {
+            name,
+            version: '1.0.0',
+            prefix: name.slice(0, 4),
+            description: `${name}`,
+            dependencies,
+            tools: [],
+        },
         start: () => {},
         stop: () => {},
     };

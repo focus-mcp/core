@@ -9,6 +9,7 @@ export type ManifestErrorCode =
     | 'INVALID_SHAPE'
     | 'INVALID_NAME'
     | 'INVALID_VERSION'
+    | 'INVALID_PREFIX'
     | 'INVALID_DESCRIPTION'
     | 'INVALID_TOOL'
     | 'DUPLICATE_TOOL'
@@ -54,6 +55,7 @@ export function parseManifest(raw: unknown): BrickManifest {
 
     const name = validateName(obj['name']);
     const version = validateVersion(obj['version']);
+    const prefix = validatePrefix(obj['prefix']);
     const description = validateDescription(obj['description']);
     const dependencies = validateDependencies(obj['dependencies']);
     const tools = validateTools(obj['tools']);
@@ -61,6 +63,7 @@ export function parseManifest(raw: unknown): BrickManifest {
     const manifest: Mutable<BrickManifest> = {
         name,
         version,
+        prefix,
         description,
         dependencies,
         tools,
@@ -118,6 +121,44 @@ function validateVersion(value: unknown): string {
             'INVALID_VERSION',
             { value },
         );
+    }
+    return value;
+}
+
+const RESERVED_PREFIXES: ReadonlySet<string> = new Set([
+    'focus',
+    'focusmcp',
+    'mcp',
+    'internal',
+    'system',
+]);
+
+function validatePrefix(value: unknown): string {
+    if (typeof value !== 'string' || value.trim() === '') {
+        throw new ManifestError(
+            'Manifest.prefix is required and must be a non-empty string',
+            'INVALID_PREFIX',
+            { value },
+        );
+    }
+    if (value.startsWith('_')) {
+        throw new ManifestError(
+            'Manifest.prefix must not start with underscore',
+            'INVALID_PREFIX',
+            { value },
+        );
+    }
+    if (/[^a-z0-9]/.test(value)) {
+        throw new ManifestError(
+            'Manifest.prefix must be lowercase alphanumeric only',
+            'INVALID_PREFIX',
+            { value },
+        );
+    }
+    if (RESERVED_PREFIXES.has(value)) {
+        throw new ManifestError(`Manifest.prefix "${value}" is reserved`, 'INVALID_PREFIX', {
+            value,
+        });
     }
     return value;
 }
