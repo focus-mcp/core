@@ -32,6 +32,12 @@
     },
     "publishConfig": {
         "access": "public",
-        "provenance": true
+        "provenance": true,
+        "registry": "https://npm.pkg.github.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/focus-mcp/core.git",
+        "directory": "packages/validator"
     }
 }
