@@ -33,11 +33,20 @@ export interface Registry {
     /** Brique par son nom (undefined si non enregistrée). */
     getBrick(name: string): Brick | undefined;
 
-    /** Tools agrégés de toutes les briques running. */
+    /** Tools agrégés de toutes les briques running, avec noms préfixés ({prefix}_{toolName}). */
     getTools(): readonly ToolDefinition[];
 
-    /** Retourne le nom de la brique qui expose le tool (running ou non). */
-    getBrickForTool(toolName: string): string | undefined;
+    /**
+     * Retourne le nom de la brique qui expose le tool préfixé (running ou non).
+     * @param prefixedName Format attendu : `{prefix}_{toolName}`
+     */
+    getBrickForTool(prefixedName: string): string | undefined;
+
+    /**
+     * Retourne le nom original (non préfixé) du tool à partir de son nom préfixé.
+     * @param prefixedName Format attendu : `{prefix}_{toolName}`
+     */
+    getOriginalToolName(prefixedName: string): string | undefined;
 }
 
 export class RegistryError extends Error {
@@ -54,6 +63,7 @@ export class RegistryError extends Error {
 export type RegistryErrorCode =
     | 'BRICK_NOT_FOUND'
     | 'BRICK_ALREADY_REGISTERED'
+    | 'DUPLICATE_PREFIX'
     | 'CYCLE_DETECTED'
     | 'MISSING_DEPENDENCY'
     | 'DEPENDENT_BRICKS_RUNNING';

@@ -10,12 +10,15 @@ function brick(
     deps: readonly string[],
     toolName: string,
     handler: (payload: unknown) => unknown,
+    prefix?: string,
 ): Brick {
+    const resolvedPrefix = prefix ?? (name.replace(/[^a-z0-9]/g, '').slice(0, 8) || 'b');
     let unsubs: Unsubscribe[] = [];
     return {
         manifest: {
             name,
             version: '1.0.0',
+            prefix: resolvedPrefix,
             description: name,
             dependencies: deps,
             tools: [{ name: toolName, description: 'x', inputSchema: { type: 'object' } }],
@@ -56,10 +59,18 @@ describe('createFocusMcp — lifecycle', () => {
         await app.stop();
     });
 
-    it('start() démarre les briques dans l’ordre des dépendances', async () => {
+    it("start() démarre les briques dans l'ordre des dépendances", async () => {
         const starts: string[] = [];
+        let _rctr = 0;
         const recording = (name: string, deps: readonly string[]): Brick => ({
-            manifest: { name, version: '1.0.0', description: name, dependencies: deps, tools: [] },
+            manifest: {
+                name,
+                version: '1.0.0',
+                prefix: `r${++_rctr}`,
+                description: name,
+                dependencies: deps,
+                tools: [],
+            },
             start(): void {
                 starts.push(name);
             },
@@ -79,12 +90,18 @@ describe('createFocusMcp — lifecycle', () => {
         await app.stop();
     });
 
-    it('expose les tools des briques running via le Router', async () => {
+    it('expose les tools des briques running via le Router (noms préfixés)', async () => {
         const app = createFocusMcp({
             bricks: [
-                brick('maths', [], 'maths_add', () => ({
-                    content: [{ type: 'text', text: '42' }],
-                })),
+                brick(
+                    'maths',
+                    [],
+                    'add',
+                    () => ({
+                        content: [{ type: 'text', text: '42' }],
+                    }),
+                    'maths',
+                ),
             ],
         });
         await app.start();
@@ -115,6 +132,7 @@ describe('createFocusMcp — permissions', () => {
             manifest: {
                 name: 'indexer',
                 version: '1.0.0',
+                prefix: 'idx',
                 description: 'indexer',
                 dependencies: [],
                 tools: [
@@ -136,6 +154,7 @@ describe('createFocusMcp — permissions', () => {
             manifest: {
                 name: 'php',
                 version: '1.0.0',
+                prefix: 'phpb',
                 description: 'php',
                 dependencies: ['indexer'],
                 tools: [

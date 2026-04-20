@@ -32,21 +32,24 @@ export class McpRouter implements Router {
         return this.#registry.getTools();
     }
 
-    async callTool(name: string, args: unknown): Promise<ToolResult> {
-        const brickName = this.#registry.getBrickForTool(name);
+    async callTool(prefixedName: string, args: unknown): Promise<ToolResult> {
+        const brickName = this.#registry.getBrickForTool(prefixedName);
         if (brickName === undefined) {
-            throw new RouterError(`Tool "${name}" not found`, 'TOOL_NOT_FOUND', { tool: name });
+            throw new RouterError(`Tool "${prefixedName}" not found`, 'TOOL_NOT_FOUND', {
+                tool: prefixedName,
+            });
         }
 
         if (this.#registry.getStatus(brickName) !== 'running') {
             throw new RouterError(
-                `Brick "${brickName}" is not running (required for tool "${name}")`,
+                `Brick "${brickName}" is not running (required for tool "${prefixedName}")`,
                 'BRICK_NOT_RUNNING',
-                { tool: name, brick: brickName },
+                { tool: prefixedName, brick: brickName },
             );
         }
 
-        const target = `${brickName}:${name}`;
+        const originalName = this.#registry.getOriginalToolName(prefixedName) ?? prefixedName;
+        const target = `${brickName}:${originalName}`;
         return await this.#bus.request<unknown, ToolResult>(target, args);
     }
 }

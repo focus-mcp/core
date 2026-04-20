@@ -12,9 +12,11 @@ interface RegistryEntry {
 
 export class InMemoryRegistry implements Registry {
     readonly #entries = new Map<string, RegistryEntry>();
+    /** prefix → brickName */
+    readonly #prefixes = new Map<string, string>();
 
     register(brick: Brick): void {
-        const { name } = brick.manifest;
+        const { name, prefix } = brick.manifest;
         if (this.#entries.has(name)) {
             throw new RegistryError(
                 `Brick "${name}" is already registered`,
@@ -24,16 +26,29 @@ export class InMemoryRegistry implements Registry {
                 },
             );
         }
+        if (this.#prefixes.has(prefix)) {
+            const owner = this.#prefixes.get(prefix);
+            throw new RegistryError(
+                `Prefix "${prefix}" is already used by brick "${owner}"`,
+                'DUPLICATE_PREFIX',
+                { prefix, owner },
+            );
+        }
         this.#entries.set(name, { brick, status: 'stopped' });
+        this.#prefixes.set(prefix, name);
     }
 
     unregister(name: string): void {
-        if (!this.#entries.has(name)) {
+        const entry = this.#entries.get(name);
+        if (!entry) {
             throw new RegistryError(`Brick "${name}" not found`, 'BRICK_NOT_FOUND', { name });
         }
-        for (const [otherName, entry] of this.#entries) {
+        for (const [otherName, otherEntry] of this.#entries) {
             if (otherName === name) continue;
-            if (entry.status === 'running' && entry.brick.manifest.dependencies.includes(name)) {
+            if (
+                otherEntry.status === 'running' &&
+                otherEntry.brick.manifest.dependencies.includes(name)
+            ) {
                 throw new RegistryError(
                     `Cannot unregister "${name}": "${otherName}" is running and depends on it`,
                     'DEPENDENT_BRICKS_RUNNING',
@@ -41,6 +56,7 @@ export class InMemoryRegistry implements Registry {
                 );
             }
         }
+        this.#prefixes.delete(entry.brick.manifest.prefix);
         this.#entries.delete(name);
     }
 
@@ -103,18 +119,40 @@ export class InMemoryRegistry implements Registry {
         const tools: ToolDefinition[] = [];
         for (const entry of this.#entries.values()) {
             if (entry.status === 'running') {
-                tools.push(...entry.brick.manifest.tools);
+                const { prefix } = entry.brick.manifest;
+                for (const tool of entry.brick.manifest.tools) {
+                    tools.push({ ...tool, name: `${prefix}_${tool.name}` });
+                }
             }
         }
         return tools;
     }
 
-    getBrickForTool(toolName: string): string | undefined {
-        for (const [name, entry] of this.#entries) {
-            for (const tool of entry.brick.manifest.tools) {
-                if (tool.name === toolName) return name;
-            }
-        }
-        return undefined;
+    getBrickForTool(prefixedName: string): string | undefined {
+        const underscoreIndex = prefixedName.indexOf('_');
+        if (underscoreIndex === -1) return undefined;
+        const prefix = prefixedName.slice(0, underscoreIndex);
+        const originalName = prefixedName.slice(underscoreIndex + 1);
+        const brickName = this.#prefixes.get(prefix);
+        if (brickName === undefined) return undefined;
+        const entry = this.#entries.get(brickName);
+        /* v8 ignore next */
+        if (!entry) return undefined;
+        const hasTool = entry.brick.manifest.tools.some((t) => t.name === originalName);
+        return hasTool ? brickName : undefined;
+    }
+
+    getOriginalToolName(prefixedName: string): string | undefined {
+        const underscoreIndex = prefixedName.indexOf('_');
+        if (underscoreIndex === -1) return undefined;
+        const prefix = prefixedName.slice(0, underscoreIndex);
+        const originalName = prefixedName.slice(underscoreIndex + 1);
+        const brickName = this.#prefixes.get(prefix);
+        if (brickName === undefined) return undefined;
+        const entry = this.#entries.get(brickName);
+        /* v8 ignore next */
+        if (!entry) return undefined;
+        const hasTool = entry.brick.manifest.tools.some((t) => t.name === originalName);
+        return hasTool ? originalName : undefined;
     }
 }

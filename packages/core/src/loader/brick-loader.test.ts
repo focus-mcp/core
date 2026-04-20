@@ -5,10 +5,11 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Brick, BrickManifest } from '../types/index.ts';
 import { type BrickSource, loadBricks } from './brick-loader.ts';
 
-function makeManifest(name: string, deps: readonly string[] = []): BrickManifest {
+function makeManifest(name: string, deps: readonly string[] = [], prefix?: string): BrickManifest {
     return {
         name,
         version: '1.0.0',
+        prefix: prefix ?? (name.replace(/[^a-z0-9]/g, '').slice(0, 8) || 'b'),
         description: `${name} brick`,
         dependencies: deps,
         tools: [],

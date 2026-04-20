@@ -7,11 +7,12 @@ import { ManifestError, parseManifest } from './manifest.ts';
 const validRaw = {
     name: 'indexer',
     version: '1.0.0',
+    prefix: 'idx',
     description: 'Indexation filesystem avec cache',
     dependencies: [],
     tools: [
         {
-            name: 'indexer_search',
+            name: 'search',
             description: 'Recherche fichiers par pattern',
             inputSchema: {
                 type: 'object',
@@ -27,12 +28,14 @@ describe('parseManifest — cas valides', () => {
         const manifest = parseManifest(validRaw);
         expect(manifest.name).toBe('indexer');
         expect(manifest.version).toBe('1.0.0');
+        expect(manifest.prefix).toBe('idx');
         expect(manifest.tools).toHaveLength(1);
     });
 
     it('accepte une string JSON', () => {
         const manifest = parseManifest(JSON.stringify(validRaw));
         expect(manifest.name).toBe('indexer');
+        expect(manifest.prefix).toBe('idx');
     });
 
     it('accepte les champs optionnels config et tags', () => {
@@ -171,5 +174,57 @@ describe('parseManifest — validation dependencies', () => {
             dependencies: ['indexer', 'cache', 'focus-sf-router'],
         });
         expect(manifest.dependencies).toEqual(['indexer', 'cache', 'focus-sf-router']);
+    });
+});
+
+describe('parseManifest — validation prefix', () => {
+    it('INVALID_PREFIX : prefix absent', () => {
+        const { prefix: _, ...rest } = validRaw;
+        expect(() => parseManifest(rest)).toThrow(
+            expect.objectContaining({ code: 'INVALID_PREFIX' }),
+        );
+    });
+
+    it('INVALID_PREFIX : string vide', () => {
+        expect(() => parseManifest({ ...validRaw, prefix: '' })).toThrow(
+            expect.objectContaining({ code: 'INVALID_PREFIX' }),
+        );
+    });
+
+    it('INVALID_PREFIX : commence par underscore', () => {
+        expect(() => parseManifest({ ...validRaw, prefix: '_idx' })).toThrow(
+            expect.objectContaining({ code: 'INVALID_PREFIX' }),
+        );
+    });
+
+    it('INVALID_PREFIX : contient des caractères non alphanumériques', () => {
+        expect(() => parseManifest({ ...validRaw, prefix: 'my-idx' })).toThrow(
+            expect.objectContaining({ code: 'INVALID_PREFIX' }),
+        );
+        expect(() => parseManifest({ ...validRaw, prefix: 'My_idx' })).toThrow(
+            expect.objectContaining({ code: 'INVALID_PREFIX' }),
+        );
+        expect(() => parseManifest({ ...validRaw, prefix: 'IDX' })).toThrow(
+            expect.objectContaining({ code: 'INVALID_PREFIX' }),
+        );
+    });
+
+    it('INVALID_PREFIX : mots réservés', () => {
+        const reserved = ['focus', 'focusmcp', 'mcp', 'internal', 'system'];
+        for (const prefix of reserved) {
+            expect(() => parseManifest({ ...validRaw, prefix })).toThrow(
+                expect.objectContaining({ code: 'INVALID_PREFIX' }),
+            );
+        }
+    });
+
+    it('accepte un prefix lowercase alphanumeric valide', () => {
+        const manifest = parseManifest({ ...validRaw, prefix: 'idx2' });
+        expect(manifest.prefix).toBe('idx2');
+    });
+
+    it('accepte un prefix composé uniquement de chiffres (sauf leading underscore)', () => {
+        const manifest = parseManifest({ ...validRaw, prefix: 'x42' });
+        expect(manifest.prefix).toBe('x42');
     });
 });
