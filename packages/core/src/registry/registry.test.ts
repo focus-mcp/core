@@ -6,10 +6,14 @@ import type { Brick } from '../types/brick.ts';
 import type { BrickManifest } from '../types/manifest.ts';
 import { InMemoryRegistry } from './registry.ts';
 
+let _prefixCounter = 0;
 function fakeBrick(manifest: Partial<BrickManifest> & Pick<BrickManifest, 'name'>): Brick {
+    // generate a unique default prefix if not provided
+    const defaultPrefix = manifest.prefix ?? `b${++_prefixCounter}`;
     return {
         manifest: {
             version: '1.0.0',
+            prefix: defaultPrefix,
             description: '',
             dependencies: [],
             tools: [],
@@ -138,18 +142,17 @@ describe('InMemoryRegistry — status', () => {
 });
 
 describe('InMemoryRegistry — getBrickForTool', () => {
-    it('retourne le nom de la brique qui expose le tool', () => {
+    it('retourne le nom de la brique via le nom préfixé', () => {
         const registry = new InMemoryRegistry();
         registry.register(
             fakeBrick({
                 name: 'indexer',
-                tools: [
-                    { name: 'indexer_search', description: '', inputSchema: { type: 'object' } },
-                ],
+                prefix: 'idx',
+                tools: [{ name: 'search', description: '', inputSchema: { type: 'object' } }],
             }),
         );
 
-        expect(registry.getBrickForTool('indexer_search')).toBe('indexer');
+        expect(registry.getBrickForTool('idx_search')).toBe('indexer');
     });
 
     it("retourne undefined si le tool n'est exposé par aucune brique", () => {
@@ -158,38 +161,54 @@ describe('InMemoryRegistry — getBrickForTool', () => {
         expect(registry.getBrickForTool('ghost_tool')).toBeUndefined();
     });
 
+    it('retourne undefined si le préfixe est inconnu', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(
+            fakeBrick({
+                name: 'indexer',
+                prefix: 'idx',
+                tools: [{ name: 'search', description: '', inputSchema: { type: 'object' } }],
+            }),
+        );
+
+        expect(registry.getBrickForTool('unknown_search')).toBeUndefined();
+    });
+
     it("cherche parmi plusieurs tools d'une brique et plusieurs briques", () => {
         const registry = new InMemoryRegistry();
         registry.register(
             fakeBrick({
                 name: 'indexer',
+                prefix: 'idx',
                 tools: [
-                    { name: 'indexer_search', description: '', inputSchema: { type: 'object' } },
-                    { name: 'indexer_stats', description: '', inputSchema: { type: 'object' } },
+                    { name: 'search', description: '', inputSchema: { type: 'object' } },
+                    { name: 'stats', description: '', inputSchema: { type: 'object' } },
                 ],
             }),
         );
         registry.register(
             fakeBrick({
                 name: 'php',
-                tools: [{ name: 'php_analyze', description: '', inputSchema: { type: 'object' } }],
+                prefix: 'phpb',
+                tools: [{ name: 'analyze', description: '', inputSchema: { type: 'object' } }],
             }),
         );
 
-        expect(registry.getBrickForTool('indexer_stats')).toBe('indexer');
-        expect(registry.getBrickForTool('php_analyze')).toBe('php');
+        expect(registry.getBrickForTool('idx_stats')).toBe('indexer');
+        expect(registry.getBrickForTool('phpb_analyze')).toBe('php');
     });
 });
 
 describe('InMemoryRegistry — getTools', () => {
-    it('agrège les tools de toutes les briques running', () => {
+    it('agrège les tools de toutes les briques running avec noms préfixés', () => {
         const registry = new InMemoryRegistry();
         registry.register(
             fakeBrick({
                 name: 'indexer',
+                prefix: 'idx',
                 tools: [
                     {
-                        name: 'indexer_search',
+                        name: 'search',
                         description: 'search',
                         inputSchema: { type: 'object' },
                     },
@@ -199,9 +218,10 @@ describe('InMemoryRegistry — getTools', () => {
         registry.register(
             fakeBrick({
                 name: 'php',
+                prefix: 'phpb',
                 tools: [
                     {
-                        name: 'php_analyze',
+                        name: 'analyze',
                         description: 'analyze',
                         inputSchema: { type: 'object' },
                     },
@@ -213,7 +233,7 @@ describe('InMemoryRegistry — getTools', () => {
 
         const toolNames = registry.getTools().map((t) => t.name);
 
-        expect(toolNames).toEqual(expect.arrayContaining(['indexer_search', 'php_analyze']));
+        expect(toolNames).toEqual(expect.arrayContaining(['idx_search', 'phpb_analyze']));
     });
 
     it("n'inclut PAS les tools des briques non-running", () => {
@@ -221,9 +241,10 @@ describe('InMemoryRegistry — getTools', () => {
         registry.register(
             fakeBrick({
                 name: 'indexer',
+                prefix: 'idx',
                 tools: [
                     {
-                        name: 'indexer_search',
+                        name: 'search',
                         description: 'search',
                         inputSchema: { type: 'object' },
                     },
@@ -232,5 +253,106 @@ describe('InMemoryRegistry — getTools', () => {
         );
 
         expect(registry.getTools()).toEqual([]);
+    });
+});
+
+describe('InMemoryRegistry — unicité du prefix', () => {
+    it("rejette l'enregistrement si le prefix est déjà utilisé", () => {
+        const registry = new InMemoryRegistry();
+        registry.register(fakeBrick({ name: 'indexer', prefix: 'idx' }));
+
+        expect(() => registry.register(fakeBrick({ name: 'other', prefix: 'idx' }))).toThrow(
+            expect.objectContaining({ name: 'RegistryError', code: 'DUPLICATE_PREFIX' }),
+        );
+    });
+
+    it('libère le prefix après unregister, permettant de le réutiliser', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(fakeBrick({ name: 'indexer', prefix: 'idx' }));
+        registry.unregister('indexer');
+
+        expect(() => registry.register(fakeBrick({ name: 'other', prefix: 'idx' }))).not.toThrow();
+    });
+});
+
+describe('getBrickForTool — edge cases', () => {
+    it('returns undefined for tool without underscore', () => {
+        const registry = new InMemoryRegistry();
+        expect(registry.getBrickForTool('noprefix')).toBeUndefined();
+    });
+
+    it('returns undefined for unknown prefix', () => {
+        const registry = new InMemoryRegistry();
+        expect(registry.getBrickForTool('unknown_tool')).toBeUndefined();
+    });
+
+    it('returns undefined for unknown tool name with valid prefix', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(
+            fakeBrick({
+                name: 'test',
+                prefix: 'tst',
+                tools: [{ name: 'search', description: 'x', inputSchema: { type: 'object' } }],
+            }),
+        );
+        expect(registry.getBrickForTool('tst_nonexistent')).toBeUndefined();
+    });
+});
+
+describe('getOriginalToolName — edge cases', () => {
+    it('returns undefined for tool without underscore', () => {
+        const registry = new InMemoryRegistry();
+        expect(registry.getOriginalToolName('noprefix')).toBeUndefined();
+    });
+
+    it('returns undefined for unknown prefix', () => {
+        const registry = new InMemoryRegistry();
+        expect(registry.getOriginalToolName('unknown_tool')).toBeUndefined();
+    });
+
+    it('returns undefined for unknown tool with valid prefix', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(
+            fakeBrick({
+                name: 'test',
+                prefix: 'tst',
+                tools: [{ name: 'search', description: 'x', inputSchema: { type: 'object' } }],
+            }),
+        );
+        expect(registry.getOriginalToolName('tst_nonexistent')).toBeUndefined();
+    });
+
+    it('returns original name for valid prefixed tool', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(
+            fakeBrick({
+                name: 'test',
+                prefix: 'tst',
+                tools: [{ name: 'search', description: 'x', inputSchema: { type: 'object' } }],
+            }),
+        );
+        expect(registry.getOriginalToolName('tst_search')).toBe('search');
+    });
+});
+
+describe('prefix edge cases — coverage', () => {
+    it('getBrickForTool returns undefined when entry exists but tool not found', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(
+            fakeBrick({
+                name: 'alpha',
+                prefix: 'alp',
+                tools: [{ name: 'one', description: 'x', inputSchema: { type: 'object' } }],
+            }),
+        );
+        expect(registry.getBrickForTool('alp_two')).toBeUndefined();
+    });
+
+    it('getOriginalToolName returns undefined when entry not in entries map', () => {
+        const registry = new InMemoryRegistry();
+        registry.register(fakeBrick({ name: 'beta', prefix: 'bet', tools: [] }));
+        // Unregister removes from entries
+        registry.unregister('beta');
+        expect(registry.getOriginalToolName('bet_x')).toBeUndefined();
     });
 });

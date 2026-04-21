@@ -24,6 +24,7 @@ function conformingBrick(): Brick {
         manifest: {
             name: 'indexer',
             version: '1.0.0',
+            prefix: 'idx',
             description: 'indexation',
             dependencies: [],
             tools: [

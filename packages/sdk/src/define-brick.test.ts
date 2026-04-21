@@ -17,6 +17,7 @@ const noopLogger: BrickLogger = {
 const validManifest = {
     name: 'indexer',
     version: '1.0.0',
+    prefix: 'idx',
     description: 'Indexation filesystem',
     dependencies: [],
     tools: [

@@ -13,6 +13,12 @@ export interface BrickManifest {
     readonly name: string;
     /** Version SemVer de la brique. */
     readonly version: string;
+    /**
+     * Prefix exposed to AI clients. Tools are listed as `{prefix}_{toolName}`.
+     * Must be lowercase alphanumeric, unique per registry.
+     * Reserved: focus, focusmcp, mcp, internal, system.
+     */
+    readonly prefix: string;
     /** Description courte (une ligne). */
     readonly description: string;
     /** Liste des briques dont cette brique dépend (whitelist EventBus). */
