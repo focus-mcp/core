@@ -10,9 +10,9 @@ const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export default defineConfig({
     resolve: {
         alias: {
-            '@focus-mcp/core': resolve(projectRoot, 'packages/core/src/index.ts'),
-            '@focus-mcp/sdk': resolve(projectRoot, 'packages/sdk/src/index.ts'),
-            '@focus-mcp/validator': resolve(projectRoot, 'packages/validator/src/index.ts'),
+            '@focusmcp/core': resolve(projectRoot, 'packages/core/src/index.ts'),
+            '@focusmcp/sdk': resolve(projectRoot, 'packages/sdk/src/index.ts'),
+            '@focusmcp/validator': resolve(projectRoot, 'packages/validator/src/index.ts'),
         },
     },
     test: {

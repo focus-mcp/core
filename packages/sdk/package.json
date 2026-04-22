@@ -1,5 +1,5 @@
 {
-    "name": "@focus-mcp/sdk",
+    "name": "@focusmcp/sdk",
     "version": "0.0.0",
     "private": false,
     "description": "FocusMCP SDK — outils et types pour développer une brique",
@@ -24,7 +24,7 @@
         "test": "vitest run"
     },
     "dependencies": {
-        "@focus-mcp/core": "workspace:*"
+        "@focusmcp/core": "workspace:*"
     },
     "devDependencies": {
         "@types/node": "^22.10.0",

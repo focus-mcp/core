@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   publish-dev:
-    name: Publish @focus-mcp/* dev packages
+    name: Publish @focusmcp/* dev packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

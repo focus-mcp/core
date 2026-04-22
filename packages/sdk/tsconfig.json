@@ -3,7 +3,7 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@focus-mcp/core": ["../core/src/index.ts"]
+            "@focusmcp/core": ["../core/src/index.ts"]
         }
     },
     "include": ["src/**/*.ts"],

@@ -54,7 +54,7 @@ function validCenterLock(overrides: Partial<CenterLock> = {}): CenterLock {
             echo: {
                 version: '1.0.0',
                 catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
-                npmPackage: '@focus-mcp/brick-echo',
+                npmPackage: '@focusmcp/brick-echo',
                 installedAt: '2026-04-01T00:00:00.000Z',
             },
         },
@@ -69,7 +69,7 @@ function validNpmBrick(overrides: Partial<CatalogBrick> = {}): CatalogBrick {
         description: 'Echo brick',
         dependencies: [],
         tools: [{ name: 'say', description: 'Echo text' }],
-        source: { type: 'npm', package: '@focus-mcp/brick-echo' },
+        source: { type: 'npm', package: '@focusmcp/brick-echo' },
         ...overrides,
     };
 }
@@ -155,7 +155,7 @@ describe('parseCenterLock', () => {
                 echo: {
                     version: '1.0.0',
                     catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
-                    npmPackage: '@focus-mcp/brick-echo',
+                    npmPackage: '@focusmcp/brick-echo',
                     installedAt: '2026-04-01T00:00:00.000Z',
                 },
             },
@@ -278,7 +278,7 @@ describe('serializeCenterLock', () => {
                 echo: {
                     version: '1.0.0',
                     catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
-                    npmPackage: '@focus-mcp/brick-echo',
+                    npmPackage: '@focusmcp/brick-echo',
                     installedAt: '2026-04-01T00:00:00.000Z',
                 },
             },
@@ -321,7 +321,7 @@ describe('planInstall', () => {
         const plan = planInstall(brick, catalogUrl);
         expect(plan).toEqual({
             name: 'echo',
-            npmPackage: '@focus-mcp/brick-echo',
+            npmPackage: '@focusmcp/brick-echo',
             version: '1.2.3',
             catalogUrl,
         });
@@ -331,7 +331,7 @@ describe('planInstall', () => {
         const brick = validNpmBrick({
             source: {
                 type: 'npm',
-                package: '@focus-mcp/brick-echo',
+                package: '@focusmcp/brick-echo',
                 registry: 'https://my.registry',
             },
         });
@@ -368,7 +368,7 @@ describe('planRemove', () => {
         const centerJson = validCenterJson();
         const centerLock = validCenterLock();
         const result = planRemove('echo', centerJson, centerLock);
-        expect(result.npmPackage).toBe('@focus-mcp/brick-echo');
+        expect(result.npmPackage).toBe('@focusmcp/brick-echo');
     });
 
     it('throws when the brick is not in center.json', () => {
@@ -401,24 +401,24 @@ describe('executeInstall', () => {
     it('calls npmInstall with the correct package and version', async () => {
         const plan: InstallPlan = {
             name: 'echo',
-            npmPackage: '@focus-mcp/brick-echo',
+            npmPackage: '@focusmcp/brick-echo',
             version: '1.2.3',
             catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
         };
         await executeInstall(io, plan, validCenterJson(), validCenterLock(), now);
-        expect(io.npmInstall).toHaveBeenCalledWith('@focus-mcp/brick-echo', '1.2.3', {});
+        expect(io.npmInstall).toHaveBeenCalledWith('@focusmcp/brick-echo', '1.2.3', {});
     });
 
     it('passes the registry option to npmInstall when provided', async () => {
         const plan: InstallPlan = {
             name: 'echo',
-            npmPackage: '@focus-mcp/brick-echo',
+            npmPackage: '@focusmcp/brick-echo',
             version: '1.2.3',
             registry: 'https://my.registry',
             catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
         };
         await executeInstall(io, plan, validCenterJson(), validCenterLock(), now);
-        expect(io.npmInstall).toHaveBeenCalledWith('@focus-mcp/brick-echo', '1.2.3', {
+        expect(io.npmInstall).toHaveBeenCalledWith('@focusmcp/brick-echo', '1.2.3', {
             registry: 'https://my.registry',
         });
     });
@@ -426,7 +426,7 @@ describe('executeInstall', () => {
     it('writes the updated center.json with the new brick entry', async () => {
         const plan: InstallPlan = {
             name: 'indexer',
-            npmPackage: '@focus-mcp/brick-indexer',
+            npmPackage: '@focusmcp/brick-indexer',
             version: '2.0.0',
             catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
         };
@@ -441,7 +441,7 @@ describe('executeInstall', () => {
     it('writes the updated center.lock with the new lock entry', async () => {
         const plan: InstallPlan = {
             name: 'indexer',
-            npmPackage: '@focus-mcp/brick-indexer',
+            npmPackage: '@focusmcp/brick-indexer',
             version: '2.0.0',
             catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
         };
@@ -453,7 +453,7 @@ describe('executeInstall', () => {
         expect(written.bricks['indexer']).toEqual({
             version: '2.0.0',
             catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
-            npmPackage: '@focus-mcp/brick-indexer',
+            npmPackage: '@focusmcp/brick-indexer',
             installedAt: now,
         });
     });
@@ -461,7 +461,7 @@ describe('executeInstall', () => {
     it('preserves existing entries when adding a new brick', async () => {
         const plan: InstallPlan = {
             name: 'indexer',
-            npmPackage: '@focus-mcp/brick-indexer',
+            npmPackage: '@focusmcp/brick-indexer',
             version: '2.0.0',
             catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
         };
@@ -486,7 +486,7 @@ describe('executeInstall', () => {
         });
         const plan: InstallPlan = {
             name: 'echo',
-            npmPackage: '@focus-mcp/brick-echo',
+            npmPackage: '@focusmcp/brick-echo',
             version: '1.0.0',
             catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
         };
@@ -498,7 +498,7 @@ describe('executeInstall', () => {
         const before = new Date().toISOString();
         const plan: InstallPlan = {
             name: 'echo',
-            npmPackage: '@focus-mcp/brick-echo',
+            npmPackage: '@focusmcp/brick-echo',
             version: '1.0.0',
             catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
         };
@@ -525,18 +525,18 @@ describe('executeRemove', () => {
         await executeRemove(
             io,
             'echo',
-            '@focus-mcp/brick-echo',
+            '@focusmcp/brick-echo',
             validCenterJson(),
             validCenterLock(),
         );
-        expect(io.npmUninstall).toHaveBeenCalledWith('@focus-mcp/brick-echo');
+        expect(io.npmUninstall).toHaveBeenCalledWith('@focusmcp/brick-echo');
     });
 
     it('removes the brick entry from center.json', async () => {
         await executeRemove(
             io,
             'echo',
-            '@focus-mcp/brick-echo',
+            '@focusmcp/brick-echo',
             validCenterJson(),
             validCenterLock(),
         );
@@ -549,7 +549,7 @@ describe('executeRemove', () => {
         await executeRemove(
             io,
             'echo',
-            '@focus-mcp/brick-echo',
+            '@focusmcp/brick-echo',
             validCenterJson(),
             validCenterLock(),
         );
@@ -570,18 +570,18 @@ describe('executeRemove', () => {
                 echo: {
                     version: '1.0.0',
                     catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
-                    npmPackage: '@focus-mcp/brick-echo',
+                    npmPackage: '@focusmcp/brick-echo',
                     installedAt: '2026-04-01T00:00:00.000Z',
                 },
                 indexer: {
                     version: '2.0.0',
                     catalogUrl: 'https://marketplace.focusmcp.dev/catalog.json',
-                    npmPackage: '@focus-mcp/brick-indexer',
+                    npmPackage: '@focusmcp/brick-indexer',
                     installedAt: '2026-04-02T00:00:00.000Z',
                 },
             },
         };
-        await executeRemove(io, 'echo', '@focus-mcp/brick-echo', centerJson, centerLock);
+        await executeRemove(io, 'echo', '@focusmcp/brick-echo', centerJson, centerLock);
 
         const writtenJson = firstCallArg<CenterJson>(io.writeCenterJson);
         expect(writtenJson.bricks['echo']).toBeUndefined();
@@ -596,7 +596,7 @@ describe('executeRemove', () => {
         await executeRemove(
             io,
             'echo',
-            '@focus-mcp/brick-echo',
+            '@focusmcp/brick-echo',
             validCenterJson(),
             validCenterLock(),
         );

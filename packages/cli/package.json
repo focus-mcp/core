@@ -1,5 +1,5 @@
 {
-    "name": "@focus-mcp/cli",
+    "name": "@focusmcp/cli",
     "version": "0.0.0",
     "private": true,
     "description": "FocusMCP CLI — focus start, add, remove, update...",

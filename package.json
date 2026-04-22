@@ -1,5 +1,5 @@
 {
-    "name": "@focus-mcp/root",
+    "name": "@focusmcp/root",
     "version": "0.0.0",
     "private": true,
     "description": "FocusMCP — Focaliser les agents AI sur l'essentiel",
@@ -43,19 +43,19 @@
     },
     "size-limit": [
         {
-            "name": "@focus-mcp/core (gzip)",
+            "name": "@focusmcp/core (gzip)",
             "path": "packages/core/dist/index.js",
             "limit": "30 KB",
             "gzip": true
         },
         {
-            "name": "@focus-mcp/sdk (gzip)",
+            "name": "@focusmcp/sdk (gzip)",
             "path": "packages/sdk/dist/index.js",
             "limit": "10 KB",
             "gzip": true
         },
         {
-            "name": "@focus-mcp/cli (gzip)",
+            "name": "@focusmcp/cli (gzip)",
             "path": "packages/cli/dist/index.js",
             "limit": "50 KB",
             "gzip": true
