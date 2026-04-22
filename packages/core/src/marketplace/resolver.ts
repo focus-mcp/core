@@ -33,7 +33,8 @@ export type CatalogBrickSource =
           readonly path: string;
           readonly ref: string;
           readonly sha?: string;
-      };
+      }
+    | { readonly type: 'npm'; readonly package: string; readonly registry?: string };
 
 export interface CatalogBrick {
     readonly name: string;
@@ -188,8 +189,16 @@ function parseSource(raw: unknown, parentLoc: string): CatalogBrickSource {
             ...(sha !== undefined ? { sha } : {}),
         };
     }
+    if (type === 'npm') {
+        const registry = optionalString(obj, 'registry', loc);
+        return {
+            type: 'npm',
+            package: requireString(obj, 'package', loc),
+            ...(registry !== undefined ? { registry } : {}),
+        };
+    }
     throw new Error(
-        `${loc}.type must be "local", "url" or "git-subdir", got ${JSON.stringify(type)}`,
+        `${loc}.type must be "local", "url", "git-subdir" or "npm", got ${JSON.stringify(type)}`,
     );
 }
 
