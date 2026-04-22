@@ -3,11 +3,11 @@
     "changelog": "@changesets/cli/changelog",
     "commit": false,
     "fixed": [],
-    "linked": [["@focus-mcp/core", "@focus-mcp/sdk"]],
+    "linked": [["@focusmcp/core", "@focusmcp/sdk"]],
     "access": "public",
     "baseBranch": "main",
     "updateInternalDependencies": "patch",
-    "ignore": ["@focus-mcp/ui", "@focus-mcp/tauri-app"],
+    "ignore": ["@focusmcp/ui", "@focusmcp/tauri-app"],
     "privatePackages": {
         "version": false,
         "tag": false

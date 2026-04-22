@@ -1,0 +1,76 @@
+# SPDX-FileCopyrightText: 2026 FocusMCP contributors
+# SPDX-License-Identifier: MIT
+
+name: Dev Publish
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dev-publish-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish-dev:
+    name: Publish @focusmcp/* dev packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+          scope: '@focus-mcp'
+      - run: pnpm install --frozen-lockfile
+      - name: Compute dev version
+        id: version
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)
+          DEV_NUM=$(git rev-list --count ${LAST_TAG}..HEAD)
+          BASE_VERSION=$(node -e "const p=require('./package.json'); console.log(p.version || '0.1.0')")
+          DEV_VERSION="${BASE_VERSION}-dev.${DEV_NUM}"
+          echo "version=${DEV_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Dev version: ${DEV_VERSION}"
+      - name: Set dev versions on all packages
+        env:
+          DEV_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          for dir in packages/*/; do
+            if [ -f "${dir}package.json" ]; then
+              node -e "
+                const fs = require('fs');
+                const pkg = JSON.parse(fs.readFileSync('${dir}package.json', 'utf-8'));
+                if (pkg.private !== true) {
+                  pkg.version = process.env.DEV_VERSION;
+                  fs.writeFileSync('${dir}package.json', JSON.stringify(pkg, null, 4) + '\n');
+                  console.log('  → ' + pkg.name + '@' + process.env.DEV_VERSION);
+                }
+              "
+            fi
+          done
+      - run: pnpm build
+      - name: Publish all packages with dev tag
+        run: |
+          for dir in packages/*/; do
+            if [ -f "${dir}package.json" ]; then
+              PRIVATE=$(node -e "console.log(require('./${dir}package.json').private)")
+              if [ "$PRIVATE" != "true" ]; then
+                NAME=$(node -e "console.log(require('./${dir}package.json').name)")
+                echo "Publishing ${NAME}..."
+                cd "$dir"
+                npm publish --tag dev --access public 2>&1 || echo "  → skipped"
+                cd ../..
+              fi
+            fi
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

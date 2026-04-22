@@ -21,7 +21,7 @@ Voir [PRD.md](../PRD.md) pour les détails fonctionnels complets.
 - [x] `McpRouter` (TDD, coverage 100%)
 - [x] Transport HTTP + HTTPS (spec MCP 2025-03-26 via SDK officiel)
 - [ ] `focus-validator` — test runner pour briques tierces
-- [ ] SDK brique (`@focus-mcp/sdk`) — helpers pour écrire une brique
+- [ ] SDK brique (`@focusmcp/sdk`) — helpers pour écrire une brique
 
 ## Phase 1 — CLI et ergonomie
 

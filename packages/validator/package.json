@@ -1,5 +1,5 @@
 {
-    "name": "@focus-mcp/validator",
+    "name": "@focusmcp/validator",
     "version": "0.0.0",
     "private": false,
     "description": "FocusMCP validator — vérifie qu'une brique respecte le contrat FocusMCP",
@@ -24,7 +24,7 @@
         "test": "vitest run"
     },
     "dependencies": {
-        "@focus-mcp/core": "workspace:*"
+        "@focusmcp/core": "workspace:*"
     },
     "devDependencies": {
         "@types/node": "^22.10.0",

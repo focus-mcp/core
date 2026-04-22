@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   publish:
-    name: Publish @focus-mcp/* to GitHub Packages
+    name: Publish @focusmcp/* to GitHub Packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

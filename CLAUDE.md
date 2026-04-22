@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 FocusMCP contributors
 SPDX-License-Identifier: MIT
 -->
 
-# CLAUDE.md — @focus-mcp/core
+# CLAUDE.md — @focusmcp/core
 
 > Auto-loaded by Claude Code (and any agents.md-compatible tool) when working in this repo.
 > This file is the **source of truth for AI agent behaviour** on this project. It replaces the
@@ -15,7 +15,7 @@ SPDX-License-Identifier: MIT
 **briques** (atomic MCP modules) that communicate via an EventBus with central guards. Site
 [focusmcp.dev](https://focusmcp.dev). Full vision : [PRD.md](./PRD.md).
 
-Ce repo héberge la **bibliothèque `@focus-mcp/core`** (Registry + EventBus + Router + SDK +
+Ce repo héberge la **bibliothèque `@focusmcp/core`** (Registry + EventBus + Router + SDK +
 Validator + marketplace resolver) importée par le CLI.
 
 ## Écosystème (3 repos actifs + 1 archivé)
@@ -23,7 +23,7 @@ Validator + marketplace resolver) importée par le CLI.
 | Repo | Statut | Rôle |
 |---|---|---|
 | `focus-mcp/core` (ici) | actif | Monorepo lib TS — 3 piliers + SDK/Validator/Marketplace resolver |
-| `focus-mcp/cli` | actif | `@focus-mcp/cli` — stdio MCP via `@modelcontextprotocol/sdk`, entrée primaire, publié npm |
+| `focus-mcp/cli` | actif | `@focusmcp/cli` — stdio MCP via `@modelcontextprotocol/sdk`, entrée primaire, publié npm |
 | `focus-mcp/marketplace` | actif | Catalogue officiel + `bricks/*` + `modules/*` (dont `manager` = dashboard). `catalog.json` publié sur gh-pages (domaine custom `marketplace.focusmcp.dev` à configurer). |
 | `focus-mcp/client` | **archivé** | Ex desktop Tauri. Pivot CLI-first (2026-04-16) a gelé ce repo en Phase 2. |
 
@@ -33,9 +33,9 @@ Validator + marketplace resolver) importée par le CLI.
 AI client (Claude Code, Cursor, Codex, Gemini…)
        │ stdio (JSON-RPC MCP)
        ▼
-@focus-mcp/cli (Node, npm)
+@focusmcp/cli (Node, npm)
   ├─ @modelcontextprotocol/sdk StdioServerTransport
-  ├─ import { createFocusMcp } from '@focus-mcp/core'  ← CE REPO
+  ├─ import { createFocusMcp } from '@focusmcp/core'  ← CE REPO
   └─ (opt-in P1) admin API HTTP côté latéral
 ```
 
@@ -73,8 +73,8 @@ héberge tout, mais l'architecture reste browser-compatible pour un futur Phase 
    `develop → main`. Feature branches éphémères (`feat/*`, `fix/*`, `docs/*`, etc.),
    auto-delete après merge.
 7. **npm orgs** — `focusmcp` ET `focus-mcp` sont réservées (squatting protection). Pas de
-   publish au MVP sauf `@focus-mcp/cli` (primary distribution). Scope canonique :
-   `@focus-mcp/*`.
+   publish au MVP sauf `@focusmcp/cli` (primary distribution). Scope canonique :
+   `@focusmcp/*`.
 8. **Rulesets GitHub** — chaque nouveau repo reçoit le couple :
    - `main protection` cible **UNIQUEMENT `refs/heads/main`** — `required_status_checks`,
      `pull_request`, `code_scanning` (CodeQL), `code_quality`, `required_linear_history`,
@@ -100,10 +100,10 @@ packages/
 ```
 
 **À surveiller** :
-- Le CLI a été **extrait dans son propre repo** (`focus-mcp/cli`) qui consomme `@focus-mcp/core`
+- Le CLI a été **extrait dans son propre repo** (`focus-mcp/cli`) qui consomme `@focusmcp/core`
   via `file:../core/packages/core` (sibling clone en CI). `packages/cli` ici est un vieux stub
   vide — à supprimer quand on fait le cleanup.
-- `@focus-mcp/core` n'est **pas publié sur npm** ; la CLI le bundle au build (`tsup --noExternal`).
+- `@focusmcp/core` n'est **pas publié sur npm** ; la CLI le bundle au build (`tsup --noExternal`).
 
 ## Commandes
 
