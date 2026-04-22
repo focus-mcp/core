@@ -4,8 +4,6 @@
     "workspaces": {
         ".": {
             "entry": [
-                "config/vitest.config.ts",
-                "config/playwright.config.ts",
                 "config/commitlint.config.js",
                 "config/lint-staged.config.js",
                 "config/stryker.config.json"
@@ -14,9 +12,6 @@
         },
         "packages/core": {},
         "packages/sdk": {},
-        "packages/cli": {
-            "entry": ["src/index.ts", "src/bin/*.ts"]
-        },
         "packages/validator": {}
     },
     "ignoreDependencies": [
@@ -24,5 +19,5 @@
         "@stryker-mutator/vitest-runner",
         "fast-check"
     ],
-    "ignoreBinaries": ["playwright", "reuse"]
+    "ignoreBinaries": ["reuse"]
 }

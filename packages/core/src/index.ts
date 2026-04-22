@@ -24,6 +24,48 @@ export {
     parseManifest,
 } from './manifest/manifest.ts';
 export {
+    type AggregatedBrick,
+    type AggregatedCatalog,
+    aggregateCatalogs,
+    type FetchIO,
+    type FetchResult,
+    fetchAllCatalogs,
+    fetchCatalog,
+    findBrickAcrossCatalogs,
+    searchBricks,
+} from './marketplace/catalog-fetcher.ts';
+export {
+    addSource,
+    type CatalogSource,
+    type CatalogStoreData,
+    type CatalogStoreIO,
+    createDefaultStore,
+    DEFAULT_CATALOG_URL,
+    disableSource,
+    enableSource,
+    getEnabledSources,
+    listSources,
+    parseCatalogStore,
+    removeSource,
+} from './marketplace/catalog-store.ts';
+export {
+    type CenterEntry,
+    type CenterJson,
+    type CenterLock,
+    type CenterLockEntry,
+    executeInstall,
+    executeRemove,
+    type InstallerIO,
+    type InstallPlan,
+    parseCenterJson,
+    parseCenterLock,
+    planInstall,
+    planRemove,
+    satisfiesRange,
+    serializeCenterJson,
+    serializeCenterLock,
+} from './marketplace/installer.ts';
+export {
     type Catalog,
     type CatalogBrick,
     type CatalogBrickSource,
