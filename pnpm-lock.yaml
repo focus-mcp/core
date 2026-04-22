@@ -115,7 +115,7 @@ importers:
 
   packages/sdk:
     dependencies:
-      '@focusmcp/core':
+      '@focus-mcp/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -131,7 +131,7 @@ importers:
 
   packages/validator:
     dependencies:
-      '@focusmcp/core':
+      '@focus-mcp/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

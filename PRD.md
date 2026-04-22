@@ -3,9 +3,9 @@ SPDX-FileCopyrightText: 2026 FocusMCP contributors
 SPDX-License-Identifier: MIT
 -->
 
-# @focusmcp/core — Product Requirements Document
+# @focus-mcp/core — Product Requirements Document
 
-> Périmètre de ce document : la **bibliothèque TypeScript** `@focusmcp/core` (package `packages/core` du monorepo).
+> Périmètre de ce document : la **bibliothèque TypeScript** `@focus-mcp/core` (package `packages/core` du monorepo).
 > Pour l'app desktop : voir le repo [`focus-mcp/client`](https://github.com/focus-mcp/client). Pour le catalogue de briques : voir le repo [`focus-mcp/marketplace`](https://github.com/focus-mcp/marketplace).
 
 ## Vision (rappel)
@@ -21,9 +21,9 @@ Comme **Node.js + npm** : le core est le runtime, les briques sont les packages.
 
 ---
 
-## Rôle de `@focusmcp/core` dans l'écosystème
+## Rôle de `@focus-mcp/core` dans l'écosystème
 
-`@focusmcp/core` est la **bibliothèque TypeScript** qui implémente toute la logique MCP :
+`@focus-mcp/core` est la **bibliothèque TypeScript** qui implémente toute la logique MCP :
 
 - **Importée par l'app desktop** (`client/`, Tauri) directement dans la WebView — pas de sidecar Node.js
 - **Aucun transport HTTP** : Tauri (Rust) est le **seul gardien HTTP** (Streamable HTTP MCP côté client)
@@ -39,7 +39,7 @@ Comme **Node.js + npm** : le core est le runtime, les briques sont les packages.
                │ Tauri commands (IPC)
 ┌──────────────▼─────────────────────┐
 │ WebView — UI Svelte                │
-│  └─ @focusmcp/core (this lib)      │
+│  └─ @focus-mcp/core (this lib)      │
 │       Registry + EventBus + Router │
 │       + briques (modules TS)       │
 └────────────────────────────────────┘
@@ -51,10 +51,10 @@ Comme **Node.js + npm** : le core est le runtime, les briques sont les packages.
 
 | Package | Rôle |
 |---|---|
-| `@focusmcp/core` | Registry, EventBus, Router, Manifest, Bootstrap, Observability |
-| `@focusmcp/sdk` | Helper `defineBrick` pour auteurs de briques |
-| `@focusmcp/validator` | Test runner conformance (manifeste, namespace, dépendances, garde-fous) |
-| `@focusmcp/cli` | CLI `focus` — gestion des briques installées |
+| `@focus-mcp/core` | Registry, EventBus, Router, Manifest, Bootstrap, Observability |
+| `@focus-mcp/sdk` | Helper `defineBrick` pour auteurs de briques |
+| `@focus-mcp/validator` | Test runner conformance (manifeste, namespace, dépendances, garde-fous) |
+| `@focus-mcp/cli` | CLI `focus` — gestion des briques installées |
 
 ---
 
@@ -169,12 +169,12 @@ Validation stricte (par `parseManifest`) : nom en kebab-case (ex: `php`, `indexe
 
 ---
 
-## SDK — `@focusmcp/sdk`
+## SDK — `@focus-mcp/sdk`
 
 Helper `defineBrick` pour les auteurs de briques :
 
 ```typescript
-import { defineBrick } from '@focusmcp/sdk'
+import { defineBrick } from '@focus-mcp/sdk'
 
 export default defineBrick({
   manifest: { /* mcp-brick.json inline ou import */ },
@@ -189,7 +189,7 @@ export default defineBrick({
 
 ---
 
-## Validator — `@focusmcp/validator`
+## Validator — `@focus-mcp/validator`
 
 Test runner qui valide qu'une brique respecte le contrat FocusMCP. Checks actuellement implémentés :
 - Manifeste valide (`INVALID_MANIFEST` via `parseManifest`)
@@ -202,7 +202,7 @@ Lancé en CI sur chaque brique du marketplace officiel et utilisable par les dé
 
 ---
 
-## CLI — `@focusmcp/cli`
+## CLI — `@focus-mcp/cli`
 
 Commandes (inspirées npm/yarn) opérant sur `~/.focus/center.json` + `~/.focus/center.lock` :
 
@@ -344,7 +344,7 @@ Les patterns transverses applicables par toutes les briques. Implémentés dans 
 - **Indexation + cache** — index FTS5 partagé (brique `focus-indexer`)
 - **Reasoning externalisé** — chaînes de pensées persistées (brique `focus-thinking`)
 
-`@focusmcp/core` ne contient aucune brique — il fournit l'infrastructure qui les rend possibles.
+`@focus-mcp/core` ne contient aucune brique — il fournit l'infrastructure qui les rend possibles.
 
 ---
 

@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 FocusMCP contributors
 // SPDX-License-Identifier: MIT
 
-import type { Brick, BrickContext, BrickLogger, EventBus } from '@focusmcp/core';
-import { InProcessEventBus, ManifestError, parseManifest } from '@focusmcp/core';
+import type { Brick, BrickContext, BrickLogger, EventBus } from '@focus-mcp/core';
+import { InProcessEventBus, ManifestError, parseManifest } from '@focus-mcp/core';
 
 export type ValidationIssueCode =
     | 'INVALID_MANIFEST'
