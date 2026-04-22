@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   publish:
-    name: Publish @focusmcp/* to GitHub Packages
+    name: Publish @focus-mcp/* to GitHub Packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -24,7 +24,7 @@ jobs:
           node-version: 22
           cache: pnpm
           registry-url: https://npm.pkg.github.com
-          scope: '@focusmcp'
+          scope: '@focus-mcp'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: |

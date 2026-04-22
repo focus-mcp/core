@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 FocusMCP contributors
 // SPDX-License-Identifier: MIT
 
-import type { BrickContext, BrickLogger } from '@focusmcp/core';
-import { InProcessEventBus } from '@focusmcp/core';
+import type { BrickContext, BrickLogger } from '@focus-mcp/core';
+import { InProcessEventBus } from '@focus-mcp/core';
 import { describe, expect, it, vi } from 'vitest';
 import { BrickDefinitionError, defineBrick } from './define-brick.ts';
 

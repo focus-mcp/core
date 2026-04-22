@@ -1,5 +1,5 @@
 {
-    "name": "@focusmcp/cli",
+    "name": "@focus-mcp/cli",
     "version": "0.0.0",
     "description": "FocusMCP CLI — focus start, add, remove, update...",
     "license": "MIT",

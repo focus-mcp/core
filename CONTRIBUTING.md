@@ -29,7 +29,7 @@ Tous les contributeurs s'engagent à respecter le [Code of Conduct](./CODE_OF_CO
 - **Conventional Commits** : `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`, `build`, `ci`, `style`, `revert`
 - **SPDX headers** dans tous les fichiers source (`SPDX-License-Identifier: MIT`)
 - **REUSE compliance** vérifiée en CI
-- **Pas de console.log** : utiliser le logger pino exposé par `@focusmcp/core`
+- **Pas de console.log** : utiliser le logger pino exposé par `@focus-mcp/core`
 - **Pas de `any`** : TypeScript strict + Biome `noExplicitAny`
 
 ## Développer une brique
