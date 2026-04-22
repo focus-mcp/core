@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 concurrency:
   group: dev-publish-${{ github.ref }}
@@ -28,8 +29,8 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          registry-url: https://registry.npmjs.org
-          scope: '@focus-mcp'
+          registry-url: https://npm.pkg.github.com
+          scope: '@focusmcp'
       - run: pnpm install --frozen-lockfile
       - name: Compute dev version
         id: version
@@ -73,4 +74,4 @@ jobs:
             fi
           done
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
