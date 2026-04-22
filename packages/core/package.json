@@ -1,6 +1,7 @@
 {
     "name": "@focusmcp/core",
     "version": "0.0.0",
+    "private": false,
     "description": "FocusMCP core — Registry, EventBus, Router, manifest parser (browser+node compatible)",
     "license": "MIT",
     "type": "module",

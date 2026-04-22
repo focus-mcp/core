@@ -1,6 +1,7 @@
 {
     "name": "@focusmcp/sdk",
     "version": "0.0.0",
+    "private": false,
     "description": "FocusMCP SDK — outils et types pour développer une brique",
     "license": "MIT",
     "type": "module",
