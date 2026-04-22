@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   publish-dev:
-    name: Publish @focusmcp/* dev packages
+    name: Publish @focus-mcp/* dev packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -29,8 +29,8 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          registry-url: https://npm.pkg.github.com
-          scope: '@focusmcp'
+          registry-url: https://registry.npmjs.org
+          scope: '@focus-mcp'
       - run: pnpm install --frozen-lockfile
       - name: Compute dev version
         id: version
@@ -74,4 +74,4 @@ jobs:
             fi
           done
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

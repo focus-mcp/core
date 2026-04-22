@@ -1,5 +1,5 @@
 {
-    "name": "@focusmcp/sdk",
+    "name": "@focus-mcp/sdk",
     "version": "0.0.0",
     "private": false,
     "description": "FocusMCP SDK — outils et types pour développer une brique",
@@ -24,7 +24,7 @@
         "test": "vitest run"
     },
     "dependencies": {
-        "@focusmcp/core": "workspace:*"
+        "@focus-mcp/core": "workspace:*"
     },
     "devDependencies": {
         "@types/node": "^22.10.0",
@@ -34,7 +34,7 @@
     "publishConfig": {
         "access": "public",
         "provenance": true,
-        "registry": "https://npm.pkg.github.com"
+        "registry": "https://registry.npmjs.org"
     },
     "repository": {
         "type": "git",

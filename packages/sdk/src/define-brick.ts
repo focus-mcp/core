@@ -7,7 +7,7 @@ import {
     type BrickManifest,
     parseManifest,
     type Unsubscribe,
-} from '@focusmcp/core';
+} from '@focus-mcp/core';
 
 export type BrickDefinitionErrorCode = 'MISSING_HANDLER' | 'UNKNOWN_HANDLER' | 'ALREADY_STARTED';
 
