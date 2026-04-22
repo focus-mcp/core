@@ -27,13 +27,11 @@ function conformingBrick(): Brick {
             prefix: 'idx',
             description: 'indexation',
             dependencies: [],
-            tools: [
-                { name: 'indexer_search', description: 'search', inputSchema: { type: 'object' } },
-            ],
+            tools: [{ name: 'search', description: 'search', inputSchema: { type: 'object' } }],
         },
         start(ctx): void {
             unsubs.push(
-                ctx.bus.handle('indexer:indexer_search', () => ({
+                ctx.bus.handle('indexer:search', () => ({
                     content: [{ type: 'text', text: 'ok' }],
                 })),
             );
@@ -121,7 +119,7 @@ describe('validateBrick — contrat tool/bus', () => {
         const brick: Brick = {
             ...conformingBrick(),
             start(ctx): void {
-                ctx.bus.handle('indexer:indexer_search', () => {
+                ctx.bus.handle('indexer:search', () => {
                     throw new Error('nope');
                 });
             },

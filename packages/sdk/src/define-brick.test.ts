@@ -22,7 +22,7 @@ const validManifest = {
     dependencies: [],
     tools: [
         {
-            name: 'indexer_search',
+            name: 'search',
             description: 'Search files',
             inputSchema: { type: 'object' as const },
         },
@@ -41,7 +41,7 @@ describe('defineBrick — shape', () => {
     it('retourne un Brick conforme avec manifest, start, stop', () => {
         const brick = defineBrick({
             manifest: validManifest,
-            handlers: { indexer_search: () => ({ files: [] }) },
+            handlers: { search: () => ({ files: [] }) },
         });
 
         expect(brick.manifest.name).toBe('indexer');
@@ -53,7 +53,7 @@ describe('defineBrick — shape', () => {
         expect(() =>
             defineBrick({
                 manifest: { ...validManifest, name: 'BadName' },
-                handlers: { indexer_search: () => 'ok' },
+                handlers: { search: () => 'ok' },
             }),
         ).toThrow(expect.objectContaining({ name: 'ManifestError', code: 'INVALID_NAME' }));
     });
@@ -77,8 +77,8 @@ describe('defineBrick — shape', () => {
             defineBrick({
                 manifest: validManifest,
                 handlers: {
-                    indexer_search: () => 'ok',
-                    orphan_tool: () => 'ko',
+                    search: () => 'ok',
+                    orphan: () => 'ko',
                 },
             }),
         ).toThrow(
@@ -96,7 +96,7 @@ describe('defineBrick — lifecycle', () => {
         const brick = defineBrick({
             manifest: validManifest,
             handlers: {
-                indexer_search: (payload) => {
+                search: (payload) => {
                     const typed = payload as { q: string };
                     return { found: typed.q };
                 },
@@ -105,7 +105,7 @@ describe('defineBrick — lifecycle', () => {
 
         await brick.start(makeCtx({ bus }));
 
-        await expect(bus.request('indexer:indexer_search', { q: 'foo' })).resolves.toEqual({
+        await expect(bus.request('indexer:search', { q: 'foo' })).resolves.toEqual({
             found: 'foo',
         });
     });
@@ -118,7 +118,7 @@ describe('defineBrick — lifecycle', () => {
         const brick = defineBrick({
             manifest: validManifest,
             handlers: {
-                indexer_search: (_payload, ctx) => {
+                search: (_payload, ctx) => {
                     ctx.logger.info('called');
                     return { version: ctx.config['phpVersion'] };
                 },
@@ -126,7 +126,7 @@ describe('defineBrick — lifecycle', () => {
         });
 
         await brick.start(makeCtx({ bus, config, logger }));
-        const result = await bus.request('indexer:indexer_search', null);
+        const result = await bus.request('indexer:search', null);
 
         expect(result).toEqual({ version: '8.3' });
         expect(logger.info).toHaveBeenCalledWith('called');
@@ -136,13 +136,13 @@ describe('defineBrick — lifecycle', () => {
         const bus = new InProcessEventBus();
         const brick = defineBrick({
             manifest: validManifest,
-            handlers: { indexer_search: () => 'ok' },
+            handlers: { search: () => 'ok' },
         });
 
         await brick.start(makeCtx({ bus }));
         await brick.stop();
 
-        await expect(bus.request('indexer:indexer_search', null)).rejects.toMatchObject({
+        await expect(bus.request('indexer:search', null)).rejects.toMatchObject({
             code: 'NO_HANDLER',
         });
     });
@@ -150,7 +150,7 @@ describe('defineBrick — lifecycle', () => {
     it('stop avant start ne throw pas', () => {
         const brick = defineBrick({
             manifest: validManifest,
-            handlers: { indexer_search: () => 'ok' },
+            handlers: { search: () => 'ok' },
         });
 
         expect(() => brick.stop()).not.toThrow();
@@ -160,7 +160,7 @@ describe('defineBrick — lifecycle', () => {
         const bus = new InProcessEventBus();
         const brick = defineBrick({
             manifest: validManifest,
-            handlers: { indexer_search: () => 'ok' },
+            handlers: { search: () => 'ok' },
         });
 
         await brick.start(makeCtx({ bus }));

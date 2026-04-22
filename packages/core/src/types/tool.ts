@@ -6,7 +6,7 @@
  * Conforme au format MCP officiel (tools/list, tools/call).
  */
 export interface ToolDefinition {
-    /** Nom du tool (préfixé par la brique au runtime, ex: "indexer_search"). */
+    /** Nom du tool sans préfixe (ex: "search"). Exposé au MCP sous la forme "{prefix}_{name}". */
     readonly name: string;
     /** Description lisible par l'AI. */
     readonly description: string;
