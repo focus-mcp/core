@@ -1,6 +1,7 @@
 {
     "name": "@focus-mcp/cli",
     "version": "0.0.0",
+    "private": true,
     "description": "FocusMCP CLI — focus start, add, remove, update...",
     "license": "MIT",
     "type": "module",
