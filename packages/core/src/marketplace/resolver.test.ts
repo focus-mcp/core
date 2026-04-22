@@ -29,7 +29,7 @@ function validBrick(overrides: Partial<CatalogBrick> = {}): CatalogBrick {
         version: '1.0.0',
         description: 'Hello-world brick',
         dependencies: [],
-        tools: [{ name: 'echo_say', description: 'Echo' }],
+        tools: [{ name: 'say', description: 'Echo' }],
         source: { type: 'local', path: 'bricks/echo' },
         ...overrides,
     };
