@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 FocusMCP contributors
 // SPDX-License-Identifier: MIT
 
+import { requireBoolean, requireObject, requireString } from './helpers.ts';
+
 /**
  * Catalog store — pure, browser-compatible.
  *
@@ -121,29 +123,4 @@ export function listSources(store: CatalogStoreData): readonly CatalogSource[] {
 
 export function getEnabledSources(store: CatalogStoreData): readonly CatalogSource[] {
     return store.sources.filter((s) => s.enabled);
-}
-
-// ---------- helpers ----------
-
-function requireObject(raw: unknown, loc: string): Record<string, unknown> {
-    if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
-        throw new Error(`${loc} must be an object`);
-    }
-    return raw as Record<string, unknown>;
-}
-
-function requireString(obj: Record<string, unknown>, key: string, parentLoc: string): string {
-    const value = obj[key];
-    if (typeof value !== 'string' || value.length === 0) {
-        throw new Error(`${parentLoc}.${key} must be a non-empty string`);
-    }
-    return value;
-}
-
-function requireBoolean(obj: Record<string, unknown>, key: string, parentLoc: string): boolean {
-    const value = obj[key];
-    if (typeof value !== 'boolean') {
-        throw new Error(`${parentLoc}.${key} must be a boolean`);
-    }
-    return value;
 }

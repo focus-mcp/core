@@ -9,6 +9,7 @@
  * that calls npm and reads/writes the center JSON and lock files.
  */
 
+import { requireBoolean, requireObject, requireString } from './helpers.ts';
 import { type CatalogBrick, compareSemver } from './resolver.ts';
 
 export { compareSemver };
@@ -228,29 +229,6 @@ export function satisfiesRange(version: string, range: string): boolean {
 }
 
 // ---------- helpers ----------
-
-function requireObject(raw: unknown, loc: string): Record<string, unknown> {
-    if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
-        throw new Error(`${loc} must be an object`);
-    }
-    return raw as Record<string, unknown>;
-}
-
-function requireString(obj: Record<string, unknown>, key: string, parentLoc: string): string {
-    const value = obj[key];
-    if (typeof value !== 'string' || value.length === 0) {
-        throw new Error(`${parentLoc}.${key} must be a non-empty string`);
-    }
-    return value;
-}
-
-function requireBoolean(obj: Record<string, unknown>, key: string, parentLoc: string): boolean {
-    const value = obj[key];
-    if (typeof value !== 'boolean') {
-        throw new Error(`${parentLoc}.${key} must be a boolean`);
-    }
-    return value;
-}
 
 function optionalRecord(
     obj: Record<string, unknown>,
