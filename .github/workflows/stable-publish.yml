@@ -1,0 +1,51 @@
+# SPDX-FileCopyrightText: 2026 FocusMCP contributors
+# SPDX-License-Identifier: MIT
+
+name: Stable Publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+concurrency:
+  group: stable-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish-stable:
+    name: Publish @focus-mcp/* packages with @latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+          scope: '@focus-mcp'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Publish all packages with latest tag
+        run: |
+          for dir in packages/*/; do
+            if [ -f "${dir}package.json" ]; then
+              PRIVATE=$(node -e "console.log(require('./${dir}package.json').private)")
+              if [ "$PRIVATE" != "true" ]; then
+                NAME=$(node -e "console.log(require('./${dir}package.json').name)")
+                VERSION=$(node -e "console.log(require('./${dir}package.json').version)")
+                echo "Publishing ${NAME}@${VERSION}..."
+                cd "$dir"
+                npm publish --access public 2>&1 || echo "  → skipped (already published?)"
+                cd ../..
+              fi
+            fi
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
