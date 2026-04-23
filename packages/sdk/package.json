@@ -2,7 +2,7 @@
     "name": "@focus-mcp/sdk",
     "version": "1.0.0",
     "private": false,
-    "description": "FocusMCP SDK — outils et types pour développer une brique",
+    "description": "Typed SDK for building FocusMCP bricks — defineBrick() helper with full type safety for tools, manifests, and bus handlers.",
     "license": "MIT",
     "type": "module",
     "main": "./dist/index.js",
@@ -35,6 +35,22 @@
         "access": "public",
         "provenance": true,
         "registry": "https://registry.npmjs.org"
+    },
+    "keywords": [
+        "mcp",
+        "model-context-protocol",
+        "ai",
+        "llm",
+        "sdk",
+        "focus",
+        "bricks",
+        "typescript",
+        "define-brick"
+    ],
+    "author": "FocusMCP contributors",
+    "homepage": "https://github.com/focus-mcp/core/tree/main/packages/sdk#readme",
+    "bugs": {
+        "url": "https://github.com/focus-mcp/core/issues"
     },
     "repository": {
         "type": "git",

@@ -3,48 +3,67 @@ SPDX-FileCopyrightText: 2026 FocusMCP contributors
 SPDX-License-Identifier: MIT
 -->
 
-# Contribuer à FocusMCP
+# Contributing to FocusMCP
 
-Merci de l'intérêt porté à FocusMCP. Ce document décrit comment contribuer.
+Thank you for your interest in FocusMCP. This document explains how to contribute.
 
 ## Code of Conduct
 
-Tous les contributeurs s'engagent à respecter le [Code of Conduct](./CODE_OF_CONDUCT.md).
+All contributors are expected to follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## Workflow
 
-1. **Fork** le repo et crée une branche : `git checkout -b feat/ma-feature`
-2. **Code en TDD** : écris les tests AVANT le code (Red → Green → Refactor)
-3. **Lint + format** : `pnpm lint:fix`
-4. **Typecheck** : `pnpm typecheck`
-5. **Test** : `pnpm test` (coverage ≥80% global, ≥95% sur EventBus/Registry)
-6. **Commit** en [Conventional Commits](https://www.conventionalcommits.org/) — enforced par commitlint
-7. **Changeset** : `pnpm changeset` si la PR introduit un changement utilisateur
-8. **Push** et ouvre une Pull Request sur [GitHub](https://github.com/focus-mcp/core/pulls)
+1. **Fork** the repo and create a branch: `git checkout -b feat/my-feature`
+2. **Code with TDD**: write tests BEFORE the code (Red → Green → Refactor)
+3. **Lint + format**: `pnpm lint:fix`
+4. **Typecheck**: `pnpm typecheck`
+5. **Test**: `pnpm test` (coverage ≥ 80% global, ≥ 95% on EventBus/Registry)
+6. **Commit** using [Conventional Commits](https://www.conventionalcommits.org/) — enforced by commitlint
+7. **Push** and open a Pull Request on [GitHub](https://github.com/focus-mcp/core/pulls) targeting `develop`
+
+> PRs must target `develop`, not `main`. The `develop` branch is permanent — never force-delete it.
 
 ## Standards
 
-- **TypeScript strict** (configuré dans `tsconfig.base.json`)
-- **TDD strict** — coverage thresholds bloquants en CI
-- **Conventional Commits** : `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`, `build`, `ci`, `style`, `revert`
-- **SPDX headers** dans tous les fichiers source (`SPDX-License-Identifier: MIT`)
-- **REUSE compliance** vérifiée en CI
-- **Pas de console.log** : utiliser le logger pino exposé par `@focus-mcp/core`
-- **Pas de `any`** : TypeScript strict + Biome `noExplicitAny`
+- **TypeScript strict** (configured in `config/tsconfig.base.json`)
+- **TDD strict** — coverage thresholds are enforced in CI
+- **Conventional Commits**: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`, `build`, `ci`, `style`, `revert`
+- **SPDX headers** in every source file (`SPDX-License-Identifier: MIT`)
+- **REUSE compliance** verified in CI
+- **No `console.log`**: use the logger from `@focus-mcp/core`
+- **No `any`**: TypeScript strict + Biome `noExplicitAny`
+- **`node:` import protocol**: always prefix Node built-ins with `node:`
 
-## Développer une brique
+## Release process
 
-Voir [packages/sdk/README.md](./packages/sdk/README.md) (à venir).
+Releases are triggered automatically by CI:
+
+- **`@dev` tag** — push to `develop` runs `dev-publish.yml`, which publishes a timestamped snapshot to npmjs.org
+- **`@latest` tag** — push to `main` runs `stable-publish.yml`, which publishes the stable release to npmjs.org
+
+There is no manual Changesets release step. Version bumps are managed directly in the package manifests before merging to `main`.
+
+## npm scope
+
+All packages are published under the `@focus-mcp` scope (with hyphen):
+
+- `@focus-mcp/core`
+- `@focus-mcp/sdk`
+- `@focus-mcp/validator`
+
+## Developing a brick
+
+See [packages/sdk/README.md](./packages/sdk/README.md) for the brick authoring guide.
 
 ## Architecture Decision Records (ADR)
 
-Toute décision architecturale significative doit être documentée dans [`docs/adr/`](./docs/adr/).
-Format : [MADR](https://adr.github.io/madr/).
+Any significant architectural decision must be documented in [`docs/adr/`](./docs/adr/).
+Format: [MADR](https://adr.github.io/madr/).
 
-## Reporter un bug / proposer une feature
+## Reporting a bug / proposing a feature
 
-Ouvre une issue avec le template approprié : [bug](https://github.com/focus-mcp/core/issues/new?template=bug.yml) ou [feature](https://github.com/focus-mcp/core/issues/new?template=feature.yml).
+Open an issue using the appropriate template: [bug](https://github.com/focus-mcp/core/issues/new?template=bug.yml) or [feature](https://github.com/focus-mcp/core/issues/new?template=feature.yml).
 
-## Sécurité
+## Security
 
-Les vulnérabilités doivent être reportées **en privé** — voir [SECURITY.md](./SECURITY.md).
+Vulnerabilities must be reported **privately** — see [SECURITY.md](./SECURITY.md).

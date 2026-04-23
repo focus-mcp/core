@@ -18,4 +18,4 @@ Ce dossier contient les ADR de FocusMCP au format [MADR](https://adr.github.io/m
 2. Incrémenter le numéro
 3. Remplir les sections (Contexte, Décision, Conséquences)
 4. Ajouter à l'index ci-dessus
-5. Soumettre via MR
+5. Submit via Pull Request
