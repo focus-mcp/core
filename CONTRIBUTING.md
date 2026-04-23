@@ -7,6 +7,32 @@ SPDX-License-Identifier: MIT
 
 Thank you for your interest in FocusMCP. This document explains how to contribute.
 
+## AI-assisted contributions
+
+FocusMCP was largely built with Claude Code. We encourage and welcome AI-assisted PRs.
+
+**You don't need to hide it.** If Claude wrote the code, just say so in the PR description
+(`Generated with Claude Code`, `Co-authored by GPT-4`, whatever's accurate). Bonus points
+for including the prompt or the key instructions you used.
+
+**What we care about, regardless of who wrote it:**
+
+- ✅ Tests pass
+- ✅ Types are strict (no `any`, no `@ts-ignore` without a comment)
+- ✅ Lint is green (`pnpm lint`)
+- ✅ Coverage ≥ 80% (100% on critical modules)
+- ✅ Commit messages follow Conventional Commits
+- ✅ PR has a clear description — "what, why, how to verify"
+- ✅ You understand the diff and can discuss design during review
+
+**What gets you rejected:**
+
+- ❌ Obviously untested AI slop (generated code that doesn't run)
+- ❌ PRs with no description, just "here's some code"
+- ❌ Hidden AI use that makes review confusing
+
+We don't care if you used AI, we care if the PR is good.
+
 ## Code of Conduct
 
 All contributors are expected to follow the [Code of Conduct](./CODE_OF_CONDUCT.md).

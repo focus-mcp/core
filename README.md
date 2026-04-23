@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 [![npm version](https://img.shields.io/npm/v/@focus-mcp/core.svg)](https://www.npmjs.com/package/@focus-mcp/core)
 [![license](https://img.shields.io/npm/l/@focus-mcp/core.svg)](./LICENSE)
 [![CI](https://github.com/focus-mcp/core/actions/workflows/ci.yml/badge.svg)](https://github.com/focus-mcp/core/actions/workflows/ci.yml)
+![Built with Claude Code](https://img.shields.io/badge/built_with-Claude_Code-8A2BE2)
 
 ## What is this?
 
@@ -131,6 +132,25 @@ pnpm build
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## AI-assisted development
+
+FocusMCP was built with heavy Claude Code assistance — its architecture, implementation,
+docs, and tests have all been co-authored with AI. We embrace this openly because:
+
+1. **Transparency matters** — we'd rather disclose it than pretend otherwise
+2. **AI tooling is the context** — we're building tools for AI agents, it makes sense to use them
+3. **Quality over origin** — what matters is that the code is tested, reviewed, and working
+
+**Your AI-assisted contributions are welcome.** We don't require you to hide the fact that
+Claude, Copilot, Cursor, or any other tool helped you. What we do expect:
+
+- Tests pass, code is typed, lint is green
+- You've read the diff and understand what the PR does
+- Conventional Commits, clear PR description
+- You can explain your design choices during review
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guidelines.
 
 ## License
 
