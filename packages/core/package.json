@@ -1,6 +1,7 @@
 {
-    "name": "@focusmcp/core",
-    "version": "0.0.0",
+    "name": "@focus-mcp/core",
+    "version": "1.0.0",
+    "private": false,
     "description": "FocusMCP core — Registry, EventBus, Router, manifest parser (browser+node compatible)",
     "license": "MIT",
     "type": "module",
@@ -35,7 +36,7 @@
     "publishConfig": {
         "access": "public",
         "provenance": true,
-        "registry": "https://npm.pkg.github.com"
+        "registry": "https://registry.npmjs.org"
     },
     "repository": {
         "type": "git",

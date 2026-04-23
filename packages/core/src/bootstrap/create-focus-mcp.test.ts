@@ -43,7 +43,7 @@ describe('createFocusMcp — assembly', () => {
 
     it('enregistre les briques passées dans options.bricks', () => {
         const app = createFocusMcp({
-            bricks: [brick('indexer', [], 'indexer_search', () => 'ok')],
+            bricks: [brick('indexer', [], 'search', () => 'ok')],
         });
         expect(app.registry.getBrick('indexer')).toBeDefined();
     });
@@ -52,7 +52,7 @@ describe('createFocusMcp — assembly', () => {
 describe('createFocusMcp — lifecycle', () => {
     it('start() passe les briques en running', async () => {
         const app = createFocusMcp({
-            bricks: [brick('maths', [], 'maths_add', () => ({ ok: true }))],
+            bricks: [brick('maths', [], 'add', () => ({ ok: true }))],
         });
         await app.start();
         expect(app.registry.getStatus('maths')).toBe('running');
@@ -117,7 +117,7 @@ describe('createFocusMcp — lifecycle', () => {
 
     it('stop() passe les briques en stopped', async () => {
         const app = createFocusMcp({
-            bricks: [brick('maths', [], 'maths_add', () => 'ok')],
+            bricks: [brick('maths', [], 'add', () => 'ok')],
         });
         await app.start();
         await app.stop();
@@ -135,12 +135,10 @@ describe('createFocusMcp — permissions', () => {
                 prefix: 'idx',
                 description: 'indexer',
                 dependencies: [],
-                tools: [
-                    { name: 'indexer_search', description: 'x', inputSchema: { type: 'object' } },
-                ],
+                tools: [{ name: 'search', description: 'x', inputSchema: { type: 'object' } }],
             },
             start(ctx): void {
-                unsubs.push(ctx.bus.handle('indexer:indexer_search', () => ({ files: [] })));
+                unsubs.push(ctx.bus.handle('indexer:search', () => ({ files: [] })));
             },
             stop(): void {
                 for (const u of unsubs) u();
@@ -158,19 +156,15 @@ describe('createFocusMcp — permissions', () => {
                 description: 'php',
                 dependencies: ['indexer'],
                 tools: [
-                    { name: 'php_ok', description: 'allowed', inputSchema: { type: 'object' } },
-                    { name: 'php_ko', description: 'denied', inputSchema: { type: 'object' } },
+                    { name: 'ok', description: 'allowed', inputSchema: { type: 'object' } },
+                    { name: 'ko', description: 'denied', inputSchema: { type: 'object' } },
                 ],
             },
             start(ctx): void {
                 phpUnsubs.push(
-                    ctx.bus.handle('php:php_ok', () =>
-                        ctx.bus.request('indexer:indexer_search', {}),
-                    ),
+                    ctx.bus.handle('php:ok', () => ctx.bus.request('indexer:search', {})),
                 );
-                phpUnsubs.push(
-                    ctx.bus.handle('php:php_ko', () => ctx.bus.request('cache:cache_get', {})),
-                );
+                phpUnsubs.push(ctx.bus.handle('php:ko', () => ctx.bus.request('cache:get', {})));
             },
             stop(): void {
                 for (const u of phpUnsubs) u();
@@ -181,8 +175,8 @@ describe('createFocusMcp — permissions', () => {
         const app = createFocusMcp({ bricks: [indexer, php] });
         await app.start();
 
-        await expect(app.bus.request('php:php_ok', {})).resolves.toEqual({ files: [] });
-        await expect(app.bus.request('php:php_ko', {})).rejects.toMatchObject({
+        await expect(app.bus.request('php:ok', {})).resolves.toEqual({ files: [] });
+        await expect(app.bus.request('php:ko', {})).rejects.toMatchObject({
             code: 'PERMISSION_DENIED',
         });
 

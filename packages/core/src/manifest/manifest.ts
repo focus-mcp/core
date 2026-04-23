@@ -226,6 +226,13 @@ function validateTool(raw: unknown): ToolDefinition {
             tool: rec,
         });
     }
+    if (/[^a-z0-9]/.test(name)) {
+        throw new ManifestError(
+            `Tool.name "${name}" must be lowercase alphanumeric only (no underscores or special chars)`,
+            'INVALID_TOOL',
+            { tool: name },
+        );
+    }
     if (typeof description !== 'string' || description.length === 0) {
         throw new ManifestError(
             `Tool "${name}" must have a non-empty description`,
