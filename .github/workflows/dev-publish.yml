@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 concurrency:
   group: dev-publish-${{ github.ref }}
@@ -17,7 +18,7 @@ concurrency:
 
 jobs:
   publish-dev:
-    name: Publish @focusmcp/* dev packages
+    name: Publish @focus-mcp/* dev packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
