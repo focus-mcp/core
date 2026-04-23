@@ -3,50 +3,55 @@ SPDX-FileCopyrightText: 2026 FocusMCP contributors
 SPDX-License-Identifier: MIT
 -->
 
-# Politique de sécurité
+# Security Policy
 
-## Versions supportées
+## Supported versions
 
-Le projet est en pré-MVP (`0.x`). Aucune version n'est encore considérée comme stable.
+| Version | Supported |
+|---|---|
+| 1.x (latest) | Yes |
+| 0.x | No |
 
-## Reporter une vulnérabilité
+## Reporting a vulnerability
 
-**Ne pas ouvrir d'issue publique** pour une vulnérabilité de sécurité.
+**Do not open a public issue** for a security vulnerability.
 
-Envoyer un rapport privé via :
-- **[GitHub Security Advisories](https://github.com/focus-mcp/core/security/advisories/new)** (recommandé)
-- ou par email : security@focusmcp.dev
+Send a private report via:
 
-Inclure si possible :
-- Description du problème
-- Étapes de reproduction
-- Impact estimé
-- Suggestions de mitigation
+- **[GitHub Security Advisories](https://github.com/focus-mcp/core/security/advisories/new)** (recommended)
+- or by email: security@focusmcp.dev
 
-## Engagement
+Please include:
 
-Nous nous engageons à :
-- **Accuser réception** sous 72h
-- **Évaluer** et **prioriser** la vulnérabilité sous 7 jours
-- **Coordonner** la divulgation responsable
-- **Créditer** le découvreur (sauf demande contraire)
+- Description of the problem
+- Steps to reproduce
+- Estimated impact
+- Suggested mitigation (if any)
 
-## Périmètre
+## Response commitment
 
-Les couches de sécurité de FocusMCP sont décrites dans le [PRD](./PRD.md#sécurité--3-couches) :
+We commit to:
 
-1. **EventBus** — garde-fous logiques (timeout, rate limit, permissions inter-briques)
-2. **Tauri sandbox** — contrôle système (filesystem, réseau)
-3. **UI** — supervision humaine
+- **Acknowledging** your report within 72 hours
+- **Evaluating and prioritising** the vulnerability within 7 days
+- **Coordinating** responsible disclosure
+- **Crediting** the reporter (unless they prefer to remain anonymous)
 
-Les vulnérabilités affectant l'une de ces couches sont prioritaires.
+## Scope
 
-## Pratiques de sécurité du projet
+FocusMCP security layers are described in the [VISION.md](./VISION.md):
 
-- Secret scanning (gitleaks) en pre-commit + CI
+1. **EventBus** — logical guards (timeout, rate limit, inter-brick permissions)
+2. **Injected providers** — sandboxed filesystem/network access via the host runtime
+3. **Human supervision** — UI oversight
+
+Vulnerabilities affecting any of these layers are treated as high priority.
+
+## Security practices
+
+- Secret scanning (gitleaks) in pre-commit hook + CI
 - Dependency scanning (Renovate + `pnpm audit`)
-- SAST (CodeQL/Semgrep) en CI
-- License compliance (refus GPL/AGPL pour préserver MIT)
-- SBOM (CycloneDX) à chaque release
-- Commits signés (GPG/SSH) requis
-- npm provenance + Sigstore pour les releases
+- SAST (CodeQL) in CI
+- License compliance (GPL/AGPL blocked to preserve MIT)
+- SBOM (CycloneDX) on every release
+- npm provenance + Sigstore for releases
