@@ -3,42 +3,42 @@ SPDX-FileCopyrightText: 2026 FocusMCP contributors
 SPDX-License-Identifier: MIT
 -->
 
-# Gouvernance FocusMCP
+# FocusMCP Governance
 
-## Statut
+## Status
 
-Projet en pré-MVP. Gouvernance simple et évolutive.
+Project at v1.0.0 (stable). Governance is intentionally lightweight and will evolve as the community grows.
 
-## Rôles
+## Roles
 
-### Mainteneurs
+### Maintainers
 
-- Approuvent les MR
-- Tranchent les ADRs (Architecture Decision Records)
-- Releasent les versions
-- Définissent la roadmap
+- Approve pull requests
+- Decide on ADRs (Architecture Decision Records)
+- Manage releases
+- Define the roadmap
 
-### Contributeurs
+### Contributors
 
-Toute personne soumettant une MR conforme aux standards (voir [CONTRIBUTING.md](../CONTRIBUTING.md)).
+Anyone submitting a PR that meets the standards described in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
-## Décisions
+## Decisions
 
-- **Petites décisions** (bugfix, refactor) : 1 approval mainteneur, merge
-- **Décisions architecturales** : ADR obligatoire dans `docs/adr/`, discussion publique, 2 approvals
-- **Breaking changes** : ADR + bump majeur + changelog détaillé + migration guide
+- **Small decisions** (bugfix, refactor): 1 maintainer approval, merge
+- **Architectural decisions**: ADR required in `docs/adr/`, public discussion, 2 approvals
+- **Breaking changes**: ADR + major semver bump + detailed changelog + migration guide
 
-## Marketplace officiel
+## Official marketplace
 
-Les briques officielles `focus-*` sont hébergées dans un repo séparé (`focus-marketplace`). Elles suivent les mêmes standards que le core et passent par `focus-validator`.
+Official bricks (`focus-*`) are hosted in a separate repo ([`focus-mcp/marketplace`](https://github.com/focus-mcp/marketplace)). They follow the same standards as the core and must pass `@focus-mcp/validator`.
 
-Le marketplace officiel **refuse les briques fourre-tout** (principe d'atomicité — voir [PRD](../PRD.md)).
+The official marketplace **rejects catch-all bricks** (atomicity principle — see [VISION.md](../VISION.md)).
 
 ## Communication
 
-- **Discussions techniques** : MR + Issues GitLab
-- **Annonces** : CHANGELOG.md + tags sémantiques
+- **Technical discussions**: PRs + GitHub Issues
+- **Announcements**: CHANGELOG.md + semantic version tags
 
-## Évolution
+## Evolution
 
-Ce document évoluera au fur et à mesure que le projet grandit (passage d'un mainteneur unique à une équipe, comité technique, etc.).
+This document will evolve as the project grows (from a single maintainer to a team, technical committee, etc.).
