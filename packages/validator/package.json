@@ -1,6 +1,6 @@
 {
     "name": "@focus-mcp/validator",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "private": false,
     "description": "FocusMCP validator — vérifie qu'une brique respecte le contrat FocusMCP",
     "license": "MIT",
