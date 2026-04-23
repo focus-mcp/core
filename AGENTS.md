@@ -21,7 +21,7 @@ Lire [PRD.md](./PRD.md) pour la vision complète, l'architecture (3 piliers : Re
 - Repos compagnons : `focus-mcp/client` (Tauri), `focus-mcp/marketplace` (briques)
 - Tests : **Vitest** (unit), **fast-check** (property-based), **Stryker** (mutation), **Playwright** (E2E)
 - Lint/format : **Biome 2.x** (pas ESLint+Prettier)
-- Logs : **pino** (`@focusmcp/core/observability/logger`)
+- Logs : **pino** (`@focus-mcp/core/observability/logger`)
 - Tracing : **OpenTelemetry**
 
 ## Organisation des fichiers
