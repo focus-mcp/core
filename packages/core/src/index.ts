@@ -46,6 +46,7 @@ export {
     getEnabledSources,
     listSources,
     parseCatalogStore,
+    type RemoveSourceOptions,
     removeSource,
 } from './marketplace/catalog-store.ts';
 export {

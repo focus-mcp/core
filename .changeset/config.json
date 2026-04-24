@@ -7,7 +7,7 @@
     "access": "public",
     "baseBranch": "main",
     "updateInternalDependencies": "patch",
-    "ignore": ["@focus-mcp/ui", "@focus-mcp/tauri-app"],
+    "ignore": [],
     "privatePackages": {
         "version": false,
         "tag": false
