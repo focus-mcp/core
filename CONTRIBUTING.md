@@ -54,7 +54,7 @@ All contributors are expected to follow the [Code of Conduct](./CODE_OF_CONDUCT.
 - **TypeScript strict** (configured in `config/tsconfig.base.json`)
 - **TDD strict** — coverage thresholds are enforced in CI
 - **Conventional Commits**: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`, `build`, `ci`, `style`, `revert`
-- **SPDX headers** in every source file (`SPDX-License-Identifier: MIT`)
+- **SPDX headers** in every source file — `SPDX-FileCopyrightText` + `SPDX-License-Identifier` set to `MIT`
 - **REUSE compliance** verified in CI
 - **No `console.log`**: use the logger from `@focus-mcp/core`
 - **No `any`**: TypeScript strict + Biome `noExplicitAny`
