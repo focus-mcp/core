@@ -79,6 +79,15 @@ export {
     parseCatalog,
     type UpdateInfo,
 } from './marketplace/resolver.ts';
+export {
+    type ExecuteUpgradeInput,
+    executeUpgrade,
+    type PlanUpgradeInput,
+    planUpgrade,
+    type UpgradeIO,
+    type UpgradeItem,
+    type UpgradeResult,
+} from './marketplace/upgrader.ts';
 export { createLogger, rootLogger } from './observability/logger.ts';
 export { getTracer, trace } from './observability/tracing.ts';
 export { permissionProviderFromRegistry } from './registry/permission-provider.ts';
