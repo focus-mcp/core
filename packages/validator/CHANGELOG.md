@@ -1,4 +1,10 @@
 <!--
+
+## 1.0.2
+### Patch Changes
+
+- Updated dependencies [dac4507]
+  - @focus-mcp/core@1.2.0
 SPDX-FileCopyrightText: 2026 FocusMCP contributors
 SPDX-License-Identifier: MIT
 -->

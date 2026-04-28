@@ -1,6 +1,6 @@
 {
     "name": "@focus-mcp/validator",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "private": false,
     "description": "Conformance test runner for FocusMCP bricks — validates manifests, tool schemas, and runtime behavior.",
     "license": "MIT",
