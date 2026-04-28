@@ -12,8 +12,7 @@ import { requireBoolean, requireObject, requireString } from './helpers.ts';
  * and mutates in-memory state only.
  */
 
-export const DEFAULT_CATALOG_URL =
-    'https://raw.githubusercontent.com/focus-mcp/marketplace/develop/publish/catalog.json';
+export const DEFAULT_CATALOG_URL = 'https://focus-mcp.github.io/marketplace/catalog.json';
 
 export interface CatalogSource {
     readonly url: string;

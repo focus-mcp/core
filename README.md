@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 # @focus-mcp/core
 
-> Runtime library for FocusMCP — the MCP orchestrator that reduces AI context from 200k to ~2k tokens.
+> Runtime library for FocusMCP — the MCP orchestrator that reduces token consumption by composing atomic, focused tools.
 
 [![npm version](https://img.shields.io/npm/v/@focus-mcp/core.svg)](https://www.npmjs.com/package/@focus-mcp/core)
 [![license](https://img.shields.io/npm/l/@focus-mcp/core.svg)](./LICENSE)
@@ -18,8 +18,12 @@ SPDX-License-Identifier: MIT
 
 It provides the **Registry**, **EventBus**, **Router**, **SDK**, **Validator**, and **marketplace resolver** — the three pillars that let atomic MCP bricks communicate, compose, and serve AI agents with minimal context overhead.
 
-> **Without FocusMCP**: the AI reads 50 raw files → 200k tokens consumed
-> **With FocusMCP**: bricks index, analyse, filter → the AI receives ~2k tokens of relevant output
+**Concrete example** (measured, see [benchmark](https://github.com/focus-mcp/marketplace/blob/main/benchmarks/equivalence-report.md)):
+- Reading a TS file natively: 8,522 tokens
+- Same file via `smartread.sr_summary`: 20 tokens (−99.8%)
+- Same file via `smartread.sr_signatures`: 44 tokens (−99.5%)
+
+The savings depend on the brick: focused tools (search, refactor, audit) reduce output by 70–99%; trivial tools (echo, format) have neutral overhead.
 
 **End users should install [`@focus-mcp/cli`](https://github.com/focus-mcp/cli)**, not this package directly.
 This package is for building custom FocusMCP hosts — servers, IDE integrations, or alternative transports.
