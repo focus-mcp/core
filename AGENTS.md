@@ -73,7 +73,7 @@ packages/
 1. **TDD strict** — write the test BEFORE the code (Red → Green → Refactor)
    - Coverage: ≥ 80% global, ≥ 95% on `event-bus/**` and `registry/**` (critical modules)
 2. **No `any`**, no `console.log` (use the browser-compatible logger from `@focus-mcp/core/observability/logger`)
-3. **SPDX header** in every source file: `SPDX-FileCopyrightText: 2026 FocusMCP contributors` + `SPDX-License-Identifier: MIT`
+3. **SPDX header** in every source file — `SPDX-FileCopyrightText: 2026 FocusMCP contributors` and `SPDX-License-Identifier` set to `MIT`
 4. **Imports**: use `node:` protocol (`import { readFile } from 'node:fs/promises'`)
 5. **Commits**: [Conventional Commits](https://www.conventionalcommits.org/) — allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
 6. **Brick atomicity**: 1 brick = 1 domain. No catch-all bricks. Convention: `focus-<domain>` or `focus-<parent>-<subdomain>`

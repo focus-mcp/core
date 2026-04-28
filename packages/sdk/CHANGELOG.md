@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 FocusMCP contributors
+SPDX-License-Identifier: MIT
+-->
+
 # @focus-mcp/sdk
 
 ## 1.1.0
