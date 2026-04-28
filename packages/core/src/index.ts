@@ -7,6 +7,20 @@ export {
     type FocusMcp,
 } from './bootstrap/create-focus-mcp.ts';
 export {
+    clearToolsConfig,
+    hideTool,
+    isToolHidden,
+    listToolsConfig,
+    matchesToolPattern,
+    parseToolConfig,
+    pinTool,
+    shouldAlwaysLoad,
+    showTool,
+    type ToolConfigData,
+    type ToolConfigIO,
+    unpinTool,
+} from './config/tool-config.ts';
+export {
     DEFAULT_GUARDS,
     type EventBusOptions,
     InProcessEventBus,
