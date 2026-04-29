@@ -1,4 +1,9 @@
 <!--
+SPDX-FileCopyrightText: 2026 FocusMCP contributors
+SPDX-License-Identifier: MIT
+-->
+
+# @focus-mcp/sdk
 
 ## 1.4.0
 ### Patch Changes
@@ -24,11 +29,6 @@
 
 - Updated dependencies [dac4507]
   - @focus-mcp/core@1.2.0
-SPDX-FileCopyrightText: 2026 FocusMCP contributors
-SPDX-License-Identifier: MIT
--->
-
-# @focus-mcp/sdk
 
 ## 1.1.0
 
