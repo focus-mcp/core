@@ -1,5 +1,15 @@
 <!--
 
+## 1.5.0
+### Minor Changes
+
+- 392a1f0: feat(core): expose keywords and recommendedFor in bricks search
+
+  Extend CatalogBrick, BrickManifest and parseBrick to support two new
+  optional fields: keywords (free-form tags) and recommendedFor
+  (stack/framework hints). searchBricks now matches on both fields in
+  addition to name, description and tags.
+
 ## 1.4.0
 ### Minor Changes
 

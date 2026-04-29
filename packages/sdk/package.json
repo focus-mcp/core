@@ -1,6 +1,6 @@
 {
     "name": "@focus-mcp/sdk",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "private": false,
     "description": "Typed SDK for building FocusMCP bricks — defineBrick() helper with full type safety for tools, manifests, and bus handlers.",
     "license": "MIT",
