@@ -1,5 +1,11 @@
 <!--
 
+## 1.4.0
+### Patch Changes
+
+- Updated dependencies [d447e61]
+  - @focus-mcp/core@1.4.0
+
 ## 1.3.1
 ### Patch Changes
 

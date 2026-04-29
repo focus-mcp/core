@@ -1,5 +1,10 @@
 <!--
 
+## 1.4.0
+### Minor Changes
+
+- d447e61: feat(core): add update-checker module for cli + bricks update detection
+
 ## 1.3.1
 ### Patch Changes
 
