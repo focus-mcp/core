@@ -94,6 +94,14 @@ export {
     type UpdateInfo,
 } from './marketplace/resolver.ts';
 export {
+    type BrickUpdateInfo,
+    type CliUpdateInfo,
+    checkForUpdates,
+    type UpdateCheckIO,
+    type UpdateCheckOptions,
+    type UpdateCheckResult,
+} from './marketplace/update-checker.ts';
+export {
     type ExecuteUpgradeInput,
     executeUpgrade,
     type PlanUpgradeInput,
