@@ -29,6 +29,10 @@ export interface BrickManifest {
     readonly config?: Readonly<Record<string, ConfigField>>;
     /** Tags pour la recherche/découverte dans le marketplace. */
     readonly tags?: readonly string[];
+    /** Free-form keywords for discovery (e.g. "typescript", "ast", "security"). */
+    readonly keywords?: readonly string[];
+    /** Stacks or frameworks this brick is recommended for (e.g. "react", "next", "symfony"). */
+    readonly recommendedFor?: readonly string[];
 }
 
 export interface ConfigField {

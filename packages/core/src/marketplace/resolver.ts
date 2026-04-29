@@ -50,6 +50,8 @@ export interface CatalogBrick {
     readonly version: string;
     readonly description: string;
     readonly tags?: readonly string[];
+    readonly keywords?: readonly string[];
+    readonly recommendedFor?: readonly string[];
     readonly dependencies: readonly string[];
     readonly tools: readonly CatalogTool[];
     readonly source: CatalogBrickSource;
@@ -138,6 +140,8 @@ function parseBrick(raw: unknown, index: number): CatalogBrick {
     const tools = requireArray(obj, 'tools', loc).map((t, ti) => parseTool(t, loc, ti));
     const source = parseSource(obj['source'], loc);
     const tags = optionalStringArray(obj, 'tags', loc);
+    const keywords = optionalStringArray(obj, 'keywords', loc);
+    const recommendedFor = optionalStringArray(obj, 'recommendedFor', loc);
     const tarballUrl = optionalString(obj, 'tarballUrl', loc);
     const integrity = optionalString(obj, 'integrity', loc);
     const publishedAt = optionalString(obj, 'publishedAt', loc);
@@ -153,6 +157,8 @@ function parseBrick(raw: unknown, index: number): CatalogBrick {
         tools,
         source,
         ...(tags !== undefined ? { tags } : {}),
+        ...(keywords !== undefined ? { keywords } : {}),
+        ...(recommendedFor !== undefined ? { recommendedFor } : {}),
         ...(tarballUrl !== undefined ? { tarballUrl } : {}),
         ...(integrity !== undefined ? { integrity } : {}),
         ...(publishedAt !== undefined ? { publishedAt } : {}),

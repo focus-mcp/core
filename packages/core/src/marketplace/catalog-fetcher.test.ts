@@ -242,6 +242,42 @@ describe('searchBricks', () => {
         const agg = makeAgg([aggBrick({ name: 'alpha' }), aggBrick({ name: 'alpha-v2' })]);
         expect(searchBricks(agg, 'alpha')).toHaveLength(2);
     });
+
+    it('matches by keyword (case-insensitive)', () => {
+        const agg = makeAgg([
+            aggBrick({ keywords: ['TypeScript', 'ast'] }),
+            aggBrick({ name: 'other', keywords: ['python'] }),
+        ]);
+        expect(searchBricks(agg, 'typescript')).toHaveLength(1);
+        expect(searchBricks(agg, 'typescript')[0]?.keywords).toContain('TypeScript');
+    });
+
+    it('matches by recommendedFor (case-insensitive)', () => {
+        const agg = makeAgg([
+            aggBrick({ recommendedFor: ['React', 'Next'] }),
+            aggBrick({ name: 'other', recommendedFor: ['vue'] }),
+        ]);
+        expect(searchBricks(agg, 'next')).toHaveLength(1);
+        expect(searchBricks(agg, 'REACT')).toHaveLength(1);
+    });
+
+    it('returns keywords and recommendedFor in search results when present', () => {
+        const agg = makeAgg([
+            aggBrick({
+                keywords: ['security', 'owasp'],
+                recommendedFor: ['symfony', 'laravel'],
+            }),
+        ]);
+        const results = searchBricks(agg, 'security');
+        expect(results).toHaveLength(1);
+        expect(results[0]?.keywords).toEqual(['security', 'owasp']);
+        expect(results[0]?.recommendedFor).toEqual(['symfony', 'laravel']);
+    });
+
+    it('does not match when keywords and recommendedFor are absent and query is specific', () => {
+        const agg = makeAgg([aggBrick({ name: 'plain' })]);
+        expect(searchBricks(agg, 'typescript')).toHaveLength(0);
+    });
 });
 
 // ---------- findBrickAcrossCatalogs ----------

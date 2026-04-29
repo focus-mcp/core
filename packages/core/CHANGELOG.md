@@ -1,9 +1,14 @@
 <!--
-SPDX-FileCopyrightText: 2026 FocusMCP contributors
-SPDX-License-Identifier: MIT
--->
 
-# @focus-mcp/core
+## 1.5.0
+### Minor Changes
+
+- 392a1f0: feat(core): expose keywords and recommendedFor in bricks search
+
+  Extend CatalogBrick, BrickManifest and parseBrick to support two new
+  optional fields: keywords (free-form tags) and recommendedFor
+  (stack/framework hints). searchBricks now matches on both fields in
+  addition to name, description and tags.
 
 ## 1.4.0
 ### Minor Changes
@@ -43,6 +48,11 @@ SPDX-License-Identifier: MIT
   Moves upgrade logic from CLI into core so that any consumer (CLI, MCP server, future client) can call `executeUpgrade` directly without going through the CLI command layer.
 
   Exports: `planUpgrade`, `executeUpgrade`, `PlanUpgradeInput`, `ExecuteUpgradeInput`, `UpgradeIO`, `UpgradeItem`, `UpgradeResult`.
+SPDX-FileCopyrightText: 2026 FocusMCP contributors
+SPDX-License-Identifier: MIT
+-->
+
+# @focus-mcp/core
 
 ## 1.1.0
 
