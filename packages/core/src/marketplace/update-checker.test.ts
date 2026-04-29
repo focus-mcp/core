@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 FocusMCP contributors
 // SPDX-License-Identifier: MIT
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { type UpdateCheckIO, checkForUpdates } from './update-checker.ts';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { checkForUpdates, type UpdateCheckIO } from './update-checker.ts';
 
 // ---------- helpers ----------
 
@@ -30,9 +30,30 @@ const CATALOG_JSON = {
     owner: { name: 'test' },
     updated: '2026-01-01',
     bricks: [
-        { name: 'treesitter', version: '0.6.0', description: '', dependencies: [], tools: [], source: { type: 'npm', package: '@focus-mcp/brick-treesitter' } },
-        { name: 'refs', version: '0.4.0', description: '', dependencies: [], tools: [], source: { type: 'npm', package: '@focus-mcp/brick-refs' } },
-        { name: 'smartread', version: '0.3.0', description: '', dependencies: [], tools: [], source: { type: 'npm', package: '@focus-mcp/brick-smartread' } },
+        {
+            name: 'treesitter',
+            version: '0.6.0',
+            description: '',
+            dependencies: [],
+            tools: [],
+            source: { type: 'npm', package: '@focus-mcp/brick-treesitter' },
+        },
+        {
+            name: 'refs',
+            version: '0.4.0',
+            description: '',
+            dependencies: [],
+            tools: [],
+            source: { type: 'npm', package: '@focus-mcp/brick-refs' },
+        },
+        {
+            name: 'smartread',
+            version: '0.3.0',
+            description: '',
+            dependencies: [],
+            tools: [],
+            source: { type: 'npm', package: '@focus-mcp/brick-smartread' },
+        },
     ],
 };
 
@@ -41,9 +62,7 @@ const CATALOG_JSON = {
 describe('checkForUpdates — cache hit', () => {
     it('returns fromCache=true when cache is fresh and cli update cached', async () => {
         const io = makeIO({
-            readFile: vi.fn().mockResolvedValue(
-                makeCacheContent({ cliLatest: '2.1.0' }),
-            ),
+            readFile: vi.fn().mockResolvedValue(makeCacheContent({ cliLatest: '2.1.0' })),
         });
 
         const result = await checkForUpdates({
@@ -94,9 +113,7 @@ describe('checkForUpdates — cache hit', () => {
 
     it('returns no cli update when cached version is same as current', async () => {
         const io = makeIO({
-            readFile: vi.fn().mockResolvedValue(
-                makeCacheContent({ cliLatest: '2.0.0' }),
-            ),
+            readFile: vi.fn().mockResolvedValue(makeCacheContent({ cliLatest: '2.0.0' })),
         });
 
         const result = await checkForUpdates({
@@ -128,7 +145,10 @@ describe('checkForUpdates — cache miss', () => {
         expect(result.fromCache).toBe(false);
         expect(result.cliUpdate).toMatchObject({ current: '2.0.0', latest: '2.1.0' });
         expect(io.writeFile).toHaveBeenCalledOnce();
-        const [path, content] = (io.writeFile as ReturnType<typeof vi.fn>).mock.calls[0] as [string, string];
+        const [path, content] = (io.writeFile as ReturnType<typeof vi.fn>).mock.calls[0] as [
+            string,
+            string,
+        ];
         expect(path).toBe('/home/test/.focus/update-cache.json');
         const cache = JSON.parse(content) as { cliLatest?: string };
         expect(cache.cliLatest).toBe('2.1.0');
@@ -350,9 +370,11 @@ describe('checkForUpdates — invalid cache format', () => {
 
     it('re-fetches when cache file has non-numeric lastCheckedAt', async () => {
         const io = makeIO({
-            readFile: vi.fn().mockResolvedValue(
-                JSON.stringify({ lastCheckedAt: 'not-a-number', cliLatest: '2.1.0' }),
-            ),
+            readFile: vi
+                .fn()
+                .mockResolvedValue(
+                    JSON.stringify({ lastCheckedAt: 'not-a-number', cliLatest: '2.1.0' }),
+                ),
             fetchJson: vi.fn().mockResolvedValue({ version: '2.1.0' }),
         });
 
@@ -387,19 +409,43 @@ describe('checkForUpdates — invalid cache format', () => {
 
 describe('checkForUpdates — multi-catalog', () => {
     it('picks the highest version across multiple catalogs', async () => {
-        const catalog1 = { ...CATALOG_JSON, bricks: [{ name: 'treesitter', version: '0.5.5', description: '', dependencies: [], tools: [], source: { type: 'npm', package: '@focus-mcp/brick-treesitter' } }] };
-        const catalog2 = { ...CATALOG_JSON, bricks: [{ name: 'treesitter', version: '0.6.0', description: '', dependencies: [], tools: [], source: { type: 'npm', package: '@focus-mcp/brick-treesitter' } }] };
+        const catalog1 = {
+            ...CATALOG_JSON,
+            bricks: [
+                {
+                    name: 'treesitter',
+                    version: '0.5.5',
+                    description: '',
+                    dependencies: [],
+                    tools: [],
+                    source: { type: 'npm', package: '@focus-mcp/brick-treesitter' },
+                },
+            ],
+        };
+        const catalog2 = {
+            ...CATALOG_JSON,
+            bricks: [
+                {
+                    name: 'treesitter',
+                    version: '0.6.0',
+                    description: '',
+                    dependencies: [],
+                    tools: [],
+                    source: { type: 'npm', package: '@focus-mcp/brick-treesitter' },
+                },
+            ],
+        };
 
         const io = makeIO({
             readFile: vi.fn().mockResolvedValue(undefined),
             getInstalledBricks: vi.fn().mockResolvedValue({ treesitter: '0.5.1' }),
-            getCatalogUrls: vi.fn().mockResolvedValue([
-                'https://catalog1.example.com/catalog.json',
-                'https://catalog2.example.com/catalog.json',
-            ]),
-            fetchJson: vi.fn()
-                .mockResolvedValueOnce(catalog1)
-                .mockResolvedValueOnce(catalog2),
+            getCatalogUrls: vi
+                .fn()
+                .mockResolvedValue([
+                    'https://catalog1.example.com/catalog.json',
+                    'https://catalog2.example.com/catalog.json',
+                ]),
+            fetchJson: vi.fn().mockResolvedValueOnce(catalog1).mockResolvedValueOnce(catalog2),
         });
 
         const result = await checkForUpdates({ includeBricks: true, io });
@@ -416,13 +462,13 @@ describe('checkForUpdates — multi-catalog', () => {
         const io = makeIO({
             readFile: vi.fn().mockResolvedValue(undefined),
             getInstalledBricks: vi.fn().mockResolvedValue({ treesitter: '0.5.1' }),
-            getCatalogUrls: vi.fn().mockResolvedValue([
-                'https://ok.example.com/catalog.json',
-                'https://fail.example.com/catalog.json',
-            ]),
-            fetchJson: vi.fn()
-                .mockResolvedValueOnce(CATALOG_JSON)
-                .mockResolvedValueOnce(undefined), // second catalog fails
+            getCatalogUrls: vi
+                .fn()
+                .mockResolvedValue([
+                    'https://ok.example.com/catalog.json',
+                    'https://fail.example.com/catalog.json',
+                ]),
+            fetchJson: vi.fn().mockResolvedValueOnce(CATALOG_JSON).mockResolvedValueOnce(undefined), // second catalog fails
         });
 
         const result = await checkForUpdates({ includeBricks: true, io });

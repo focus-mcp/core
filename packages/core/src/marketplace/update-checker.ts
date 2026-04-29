@@ -2,14 +2,16 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * Update checker — pure, Node-only (uses fs/os).
+ * Update checker — pure, browser-compatible.
  *
  * Checks if a newer version of @focus-mcp/cli or installed bricks is
  * available on the npm registry or the configured catalog. Results are
  * cached in ~/.focus/update-cache.json and only refreshed after
  * `throttleHours` (default 24h).
  *
- * All I/O is injected via UpdateCheckIO so the module is fully testable.
+ * All I/O is injected via UpdateCheckIO so the module is fully testable
+ * and environment-agnostic (no Node.js built-ins imported here).
+ * The Node.js adapter (`makeNodeIO`) lives in @focus-mcp/cli.
  */
 
 // ---------- interfaces ----------
@@ -26,8 +28,8 @@ export interface UpdateCheckOptions {
      * unreliable for globally installed packages).
      */
     cliCurrentVersion?: string;
-    /** Injected I/O; defaults to real Node I/O when omitted. */
-    io?: UpdateCheckIO;
+    /** Injected I/O adapter (required — no default Node.js fallback). */
+    io: UpdateCheckIO;
 }
 
 export interface CliUpdateInfo {
@@ -127,7 +129,10 @@ function extractLatestVersion(json: unknown): string | undefined {
 /** Returns 1 if a > b, -1 if a < b, 0 if equal. Simple numeric semver compare. */
 function compareSemver(a: string, b: string): -1 | 0 | 1 {
     const parse = (s: string): [number, number, number] => {
-        const [maj, min, pat] = s.replace(/[^0-9.]/g, '').split('.').map(Number);
+        const [maj, min, pat] = s
+            .replace(/[^0-9.]/g, '')
+            .split('.')
+            .map(Number);
         return [maj ?? 0, min ?? 0, pat ?? 0];
     };
     const [aMaj, aMin, aPat] = parse(a);
@@ -138,7 +143,7 @@ function compareSemver(a: string, b: string): -1 | 0 | 1 {
     return 0;
 }
 
-function buildCliCommand(currentVersion: string): string {
+function buildCliCommand(): string {
     // Detect package manager from env (same heuristic as cli-updater.ts)
     const execPath = process.env['npm_execpath'] ?? '';
     if (execPath.includes('pnpm')) return `pnpm add -g ${CLI_PACKAGE}@latest`;
@@ -146,97 +151,85 @@ function buildCliCommand(currentVersion: string): string {
     return `npm install -g ${CLI_PACKAGE}@latest`;
 }
 
-// ---------- real I/O implementation ----------
+// ---------- internal fetch helpers ----------
 
-/** Default Node.js I/O implementation. Lazily imported to keep core browser-safe. */
-async function makeNodeIO(): Promise<UpdateCheckIO> {
-    const { readFile, writeFile, mkdir } = await import('node:fs/promises');
-    const { homedir } = await import('node:os');
-    const { join, dirname } = await import('node:path');
-    const { createDefaultStore, getEnabledSources, parseCatalogStore } = await import(
-        './catalog-store.ts'
+async function fetchCliLatest(io: UpdateCheckIO): Promise<string | undefined> {
+    const json = await io.fetchJson(
+        `https://registry.npmjs.org/${CLI_PACKAGE}/latest`,
+        NETWORK_TIMEOUT_MS,
+    );
+    return extractLatestVersion(json);
+}
+
+function extractBricksFromCatalog(data: unknown): Array<{ name: string; version: string }> {
+    if (
+        data === null ||
+        typeof data !== 'object' ||
+        !('bricks' in data) ||
+        !Array.isArray((data as Record<string, unknown>)['bricks'])
+    ) {
+        return [];
+    }
+
+    const bricks = (data as Record<string, unknown>)['bricks'] as unknown[];
+    const result: Array<{ name: string; version: string }> = [];
+
+    for (const brick of bricks) {
+        if (
+            brick !== null &&
+            typeof brick === 'object' &&
+            'name' in brick &&
+            'version' in brick &&
+            typeof (brick as Record<string, unknown>)['name'] === 'string' &&
+            typeof (brick as Record<string, unknown>)['version'] === 'string'
+        ) {
+            result.push({
+                name: (brick as Record<string, unknown>)['name'] as string,
+                version: (brick as Record<string, unknown>)['version'] as string,
+            });
+        }
+    }
+
+    return result;
+}
+
+function buildCatalogLatest(
+    catalogResults: PromiseSettledResult<unknown>[],
+): Record<string, string> {
+    const catalogLatest: Record<string, string> = {};
+
+    for (const result of catalogResults) {
+        if (result.status !== 'fulfilled' || !result.value) continue;
+        for (const { name, version } of extractBricksFromCatalog(result.value)) {
+            const existing = catalogLatest[name];
+            if (!existing || compareSemver(version, existing) === 1) {
+                catalogLatest[name] = version;
+            }
+        }
+    }
+
+    return catalogLatest;
+}
+
+async function fetchBricksCache(io: UpdateCheckIO): Promise<Record<string, BrickCacheEntry>> {
+    const installed = await io.getInstalledBricks();
+    const catalogUrls = await io.getCatalogUrls();
+
+    const catalogResults = await Promise.allSettled(
+        catalogUrls.map((url) => io.fetchJson(url, NETWORK_TIMEOUT_MS)),
     );
 
-    const focusDir = join(homedir(), '.focus');
+    const catalogLatest = buildCatalogLatest(catalogResults);
 
-    return {
-        getFocusDir: () => focusDir,
+    const bricksWithUpdates: Record<string, BrickCacheEntry> = {};
+    for (const [name, installedVersion] of Object.entries(installed)) {
+        const latest = catalogLatest[name];
+        if (latest && compareSemver(latest, installedVersion) === 1) {
+            bricksWithUpdates[name] = { latest, current: installedVersion };
+        }
+    }
 
-        async readFile(path: string): Promise<string | undefined> {
-            try {
-                return await readFile(path, 'utf-8');
-            } catch {
-                return undefined;
-            }
-        },
-
-        async writeFile(path: string, content: string): Promise<void> {
-            await mkdir(dirname(path), { recursive: true });
-            await writeFile(path, content, 'utf-8');
-        },
-
-        async fetchJson(url: string, timeoutMs: number): Promise<unknown | undefined> {
-            try {
-                const controller = new AbortController();
-                const timer = setTimeout(() => {
-                    controller.abort();
-                }, timeoutMs);
-                try {
-                    const res = await fetch(url, { signal: controller.signal });
-                    if (!res.ok) return undefined;
-                    return (await res.json()) as unknown;
-                } finally {
-                    clearTimeout(timer);
-                }
-            } catch {
-                return undefined;
-            }
-        },
-
-        async getInstalledBricks(): Promise<Record<string, string>> {
-            try {
-                const raw = await readFile(join(focusDir, 'center.json'), 'utf-8');
-                const parsed = JSON.parse(raw) as unknown;
-                if (
-                    parsed !== null &&
-                    typeof parsed === 'object' &&
-                    'bricks' in parsed &&
-                    typeof (parsed as Record<string, unknown>)['bricks'] === 'object'
-                ) {
-                    const bricks = (parsed as Record<string, unknown>)['bricks'] as Record<
-                        string,
-                        unknown
-                    >;
-                    const result: Record<string, string> = {};
-                    for (const [name, entry] of Object.entries(bricks)) {
-                        if (
-                            entry !== null &&
-                            typeof entry === 'object' &&
-                            'version' in entry &&
-                            typeof (entry as Record<string, unknown>)['version'] === 'string'
-                        ) {
-                            result[name] = (entry as Record<string, unknown>)['version'] as string;
-                        }
-                    }
-                    return result;
-                }
-            } catch {
-                // center.json absent or invalid — silently ignore
-            }
-            return {};
-        },
-
-        async getCatalogUrls(): Promise<readonly string[]> {
-            try {
-                const raw = await readFile(join(focusDir, 'catalog-store.json'), 'utf-8');
-                const parsed = JSON.parse(raw) as unknown;
-                const store = parseCatalogStore(parsed);
-                return getEnabledSources(store).map((s) => s.url);
-            } catch {
-                return getEnabledSources(createDefaultStore()).map((s) => s.url);
-            }
-        },
-    };
+    return bricksWithUpdates;
 }
 
 // ---------- checkForUpdates ----------
@@ -246,16 +239,19 @@ async function makeNodeIO(): Promise<UpdateCheckIO> {
  *
  * Network errors are swallowed: the function always resolves (never rejects).
  * When throttled, returns the cached result immediately.
+ *
+ * The `io` adapter must be provided by the caller (e.g. `makeNodeIO` from
+ * @focus-mcp/cli). This keeps the core browser-compatible.
  */
-export async function checkForUpdates(opts: UpdateCheckOptions = {}): Promise<UpdateCheckResult> {
+export async function checkForUpdates(opts: UpdateCheckOptions): Promise<UpdateCheckResult> {
     const {
         includeCli = false,
         includeBricks = false,
         throttleHours = DEFAULT_THROTTLE_HOURS,
         cliCurrentVersion,
+        io,
     } = opts;
 
-    const io: UpdateCheckIO = opts.io ?? (await makeNodeIO());
     const cachePath = `${io.getFocusDir()}/${CACHE_FILE}`;
 
     // --- throttle check ---
@@ -264,76 +260,19 @@ export async function checkForUpdates(opts: UpdateCheckOptions = {}): Promise<Up
     const now = Date.now();
 
     if (cache && now - cache.lastCheckedAt < throttleHours * 3_600_000) {
-        // Serve from cache
-        return buildResult(
-            cache,
-            { includeCli, includeBricks, cliCurrentVersion },
-            true,
-        );
+        return buildResult(cache, { includeCli, includeBricks, cliCurrentVersion }, true);
     }
 
     // --- fetch fresh data ---
     const newCache: UpdateCache = { lastCheckedAt: now };
 
     if (includeCli) {
-        const json = await io.fetchJson(
-            `https://registry.npmjs.org/${CLI_PACKAGE}/latest`,
-            NETWORK_TIMEOUT_MS,
-        );
-        const latest = extractLatestVersion(json);
+        const latest = await fetchCliLatest(io);
         if (latest) newCache.cliLatest = latest;
     }
 
     if (includeBricks) {
-        const installed = await io.getInstalledBricks();
-        const catalogUrls = await io.getCatalogUrls();
-
-        // Fetch all catalogs concurrently (silently ignore failures)
-        const catalogResults = await Promise.allSettled(
-            catalogUrls.map((url) => io.fetchJson(url, NETWORK_TIMEOUT_MS)),
-        );
-
-        // Build a map: brickName → latest version across all catalogs
-        const catalogLatest: Record<string, string> = {};
-        for (const result of catalogResults) {
-            if (result.status !== 'fulfilled' || !result.value) continue;
-            const data = result.value;
-            if (
-                data !== null &&
-                typeof data === 'object' &&
-                'bricks' in data &&
-                Array.isArray((data as Record<string, unknown>)['bricks'])
-            ) {
-                const bricks = (data as Record<string, unknown>)['bricks'] as unknown[];
-                for (const brick of bricks) {
-                    if (
-                        brick !== null &&
-                        typeof brick === 'object' &&
-                        'name' in brick &&
-                        'version' in brick &&
-                        typeof (brick as Record<string, unknown>)['name'] === 'string' &&
-                        typeof (brick as Record<string, unknown>)['version'] === 'string'
-                    ) {
-                        const name = (brick as Record<string, unknown>)['name'] as string;
-                        const version = (brick as Record<string, unknown>)['version'] as string;
-                        const existing = catalogLatest[name];
-                        if (!existing || compareSemver(version, existing) === 1) {
-                            catalogLatest[name] = version;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Only store bricks that actually have an update
-        const bricksWithUpdates: Record<string, BrickCacheEntry> = {};
-        for (const [name, installedVersion] of Object.entries(installed)) {
-            const latest = catalogLatest[name];
-            if (latest && compareSemver(latest, installedVersion) === 1) {
-                bricksWithUpdates[name] = { latest, current: installedVersion };
-            }
-        }
-        newCache.bricksLatest = bricksWithUpdates;
+        newCache.bricksLatest = await fetchBricksCache(io);
     }
 
     // Persist cache (best-effort, never throw)
@@ -366,7 +305,7 @@ function buildResult(
             (result as { cliUpdate?: CliUpdateInfo }).cliUpdate = {
                 current: opts.cliCurrentVersion,
                 latest: cache.cliLatest,
-                command: buildCliCommand(opts.cliCurrentVersion),
+                command: buildCliCommand(),
             };
         }
     }

@@ -94,6 +94,14 @@ export {
     type UpdateInfo,
 } from './marketplace/resolver.ts';
 export {
+    type BrickUpdateInfo,
+    type CliUpdateInfo,
+    checkForUpdates,
+    type UpdateCheckIO,
+    type UpdateCheckOptions,
+    type UpdateCheckResult,
+} from './marketplace/update-checker.ts';
+export {
     type ExecuteUpgradeInput,
     executeUpgrade,
     type PlanUpgradeInput,
@@ -102,14 +110,6 @@ export {
     type UpgradeItem,
     type UpgradeResult,
 } from './marketplace/upgrader.ts';
-export {
-    type BrickUpdateInfo,
-    checkForUpdates,
-    type CliUpdateInfo,
-    type UpdateCheckIO,
-    type UpdateCheckOptions,
-    type UpdateCheckResult,
-} from './marketplace/update-checker.ts';
 export { createLogger, rootLogger } from './observability/logger.ts';
 export { getTracer, trace } from './observability/tracing.ts';
 export { permissionProviderFromRegistry } from './registry/permission-provider.ts';
