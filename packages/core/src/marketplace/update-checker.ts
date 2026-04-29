@@ -148,7 +148,6 @@ function buildCliCommand(currentVersion: string): string {
 
 // ---------- real I/O implementation ----------
 
-/* v8 ignore next 90 -- Node.js I/O adapter; covered by integration tests, not unit tests */
 /** Default Node.js I/O implementation. Lazily imported to keep core browser-safe. */
 async function makeNodeIO(): Promise<UpdateCheckIO> {
     const { readFile, writeFile, mkdir } = await import('node:fs/promises');

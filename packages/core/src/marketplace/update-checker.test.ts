@@ -266,6 +266,123 @@ describe('checkForUpdates — defaults', () => {
     });
 });
 
+// ---------- buildCliCommand (package manager detection) ----------
+
+describe('checkForUpdates — buildCliCommand', () => {
+    const originalExecPath = process.env['npm_execpath'];
+
+    afterEach(() => {
+        if (originalExecPath === undefined) {
+            delete process.env['npm_execpath'];
+        } else {
+            process.env['npm_execpath'] = originalExecPath;
+        }
+    });
+
+    it('suggests pnpm command when npm_execpath contains pnpm', async () => {
+        process.env['npm_execpath'] = '/usr/local/lib/node_modules/pnpm/bin/pnpm.cjs';
+        const io = makeIO({
+            readFile: vi.fn().mockResolvedValue(undefined),
+            fetchJson: vi.fn().mockResolvedValue({ version: '2.1.0' }),
+        });
+
+        const result = await checkForUpdates({
+            includeCli: true,
+            cliCurrentVersion: '2.0.0',
+            io,
+        });
+
+        expect(result.cliUpdate?.command).toBe('pnpm add -g @focus-mcp/cli@latest');
+    });
+
+    it('suggests yarn command when npm_execpath contains yarn', async () => {
+        process.env['npm_execpath'] = '/usr/local/lib/node_modules/yarn/bin/yarn.js';
+        const io = makeIO({
+            readFile: vi.fn().mockResolvedValue(undefined),
+            fetchJson: vi.fn().mockResolvedValue({ version: '2.1.0' }),
+        });
+
+        const result = await checkForUpdates({
+            includeCli: true,
+            cliCurrentVersion: '2.0.0',
+            io,
+        });
+
+        expect(result.cliUpdate?.command).toBe('yarn global add @focus-mcp/cli@latest');
+    });
+
+    it('suggests npm command when npm_execpath is not set', async () => {
+        delete process.env['npm_execpath'];
+        const io = makeIO({
+            readFile: vi.fn().mockResolvedValue(undefined),
+            fetchJson: vi.fn().mockResolvedValue({ version: '2.1.0' }),
+        });
+
+        const result = await checkForUpdates({
+            includeCli: true,
+            cliCurrentVersion: '2.0.0',
+            io,
+        });
+
+        expect(result.cliUpdate?.command).toBe('npm install -g @focus-mcp/cli@latest');
+    });
+});
+
+// ---------- parseCacheFile edge cases ----------
+
+describe('checkForUpdates — invalid cache format', () => {
+    it('re-fetches when cache file is valid JSON but missing lastCheckedAt', async () => {
+        const io = makeIO({
+            readFile: vi.fn().mockResolvedValue(JSON.stringify({ other: 'data' })),
+            fetchJson: vi.fn().mockResolvedValue({ version: '2.1.0' }),
+        });
+
+        const result = await checkForUpdates({
+            includeCli: true,
+            cliCurrentVersion: '2.0.0',
+            io,
+        });
+
+        // Should have fetched (cache was invalid)
+        expect(result.fromCache).toBe(false);
+        expect(io.fetchJson).toHaveBeenCalled();
+    });
+
+    it('re-fetches when cache file has non-numeric lastCheckedAt', async () => {
+        const io = makeIO({
+            readFile: vi.fn().mockResolvedValue(
+                JSON.stringify({ lastCheckedAt: 'not-a-number', cliLatest: '2.1.0' }),
+            ),
+            fetchJson: vi.fn().mockResolvedValue({ version: '2.1.0' }),
+        });
+
+        const result = await checkForUpdates({
+            includeCli: true,
+            cliCurrentVersion: '2.0.0',
+            io,
+        });
+
+        expect(result.fromCache).toBe(false);
+        expect(io.fetchJson).toHaveBeenCalled();
+    });
+
+    it('re-fetches when cache file is invalid JSON (catch branch)', async () => {
+        const io = makeIO({
+            readFile: vi.fn().mockResolvedValue('{ not valid json {{'),
+            fetchJson: vi.fn().mockResolvedValue({ version: '2.1.0' }),
+        });
+
+        const result = await checkForUpdates({
+            includeCli: true,
+            cliCurrentVersion: '2.0.0',
+            io,
+        });
+
+        expect(result.fromCache).toBe(false);
+        expect(io.fetchJson).toHaveBeenCalled();
+    });
+});
+
 // ---------- multiple catalogs ----------
 
 describe('checkForUpdates — multi-catalog', () => {
