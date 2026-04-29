@@ -1,5 +1,11 @@
 <!--
 
+## 1.3.1
+### Patch Changes
+
+- cdf988f: chore(ci): auto-tag and create GitHub Release on stable publish
+- 343e448: fix(ci): use calculated version for dev snapshots (no more 0.0.0-dev-X tags)
+
 ## 1.3.0
 ### Minor Changes
 
