@@ -129,7 +129,9 @@ export function searchBricks(
         (b) =>
             b.name.toLowerCase().includes(q) ||
             b.description.toLowerCase().includes(q) ||
-            (b.tags ?? []).some((t) => t.toLowerCase().includes(q)),
+            (b.tags ?? []).some((t) => t.toLowerCase().includes(q)) ||
+            (b.keywords ?? []).some((k) => k.toLowerCase().includes(q)) ||
+            (b.recommendedFor ?? []).some((r) => r.toLowerCase().includes(q)),
     );
 }
 

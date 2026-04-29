@@ -170,3 +170,42 @@ describe('listUpdates', () => {
         expect(listUpdates(installed, catalog)).toEqual([]);
     });
 });
+
+describe('parseCatalog — keywords and recommendedFor', () => {
+    it('parses a brick with keywords and recommendedFor', () => {
+        const raw = validCatalog([
+            validBrick({
+                keywords: ['typescript', 'ast', 'code-intel'],
+                recommendedFor: ['react', 'next', 'vue'],
+            }),
+        ]);
+        const catalog = parseCatalog(raw);
+        const brick = catalog.bricks[0];
+        expect(brick?.keywords).toEqual(['typescript', 'ast', 'code-intel']);
+        expect(brick?.recommendedFor).toEqual(['react', 'next', 'vue']);
+    });
+
+    it('omits keywords and recommendedFor when absent from the brick', () => {
+        const raw = validCatalog([validBrick()]);
+        const catalog = parseCatalog(raw);
+        const brick = catalog.bricks[0];
+        expect(brick?.keywords).toBeUndefined();
+        expect(brick?.recommendedFor).toBeUndefined();
+    });
+
+    it('rejects keywords that contain non-string items', () => {
+        const bad = {
+            ...validCatalog([validBrick()]),
+            bricks: [{ ...validBrick(), keywords: [42] }],
+        };
+        expect(() => parseCatalog(bad)).toThrow(/keywords/i);
+    });
+
+    it('rejects recommendedFor that contain non-string items', () => {
+        const bad = {
+            ...validCatalog([validBrick()]),
+            bricks: [{ ...validBrick(), recommendedFor: [true] }],
+        };
+        expect(() => parseCatalog(bad)).toThrow(/recommendedFor/i);
+    });
+});
