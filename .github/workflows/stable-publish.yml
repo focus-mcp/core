@@ -32,8 +32,6 @@ jobs:
           scope: '@focus-mcp'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - name: Upgrade npm for OIDC Trusted Publishing support
-        run: npm install -g npm@latest
       - name: Publish all packages with latest tag
         run: |
           for dir in packages/*/; do
