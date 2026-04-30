@@ -44,6 +44,9 @@ jobs:
                 cd "$dir"
                 npm publish --access public 2>&1 || echo "  → skipped (already published?)"
                 cd ../..
+                # Ensure @latest tag is set even if version was previously published
+                echo "Setting @latest tag for ${NAME}@${VERSION}..."
+                npm dist-tag add "${NAME}@${VERSION}" latest || echo "  → dist-tag update skipped"
               fi
             fi
           done
