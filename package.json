@@ -39,7 +39,8 @@
         "changeset": "changeset",
         "version": "changeset version",
         "release": "changeset publish",
-        "prepare": "husky"
+        "prepare": "husky",
+        "preflight": "bash scripts/preflight-release.sh"
     },
     "size-limit": [
         {
