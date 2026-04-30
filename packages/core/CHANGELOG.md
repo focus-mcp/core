@@ -1,5 +1,10 @@
 <!--
 
+## 1.5.1
+### Patch Changes
+
+- a8126f3: chore(release): bump core/sdk/validator after dev-publish, back-merge, check-changeset, preflight infra fixes
+
 ## 1.5.0
 ### Minor Changes
 
