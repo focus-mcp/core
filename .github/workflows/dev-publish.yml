@@ -33,8 +33,6 @@ jobs:
           registry-url: https://registry.npmjs.org
           scope: '@focus-mcp'
       - run: pnpm install --frozen-lockfile
-      - name: Upgrade npm for OIDC Trusted Publishing support
-        run: npm install -g npm@latest
       - name: Check for pending changesets
         id: pending
         run: |
