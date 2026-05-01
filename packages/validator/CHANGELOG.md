@@ -1,5 +1,12 @@
 <!--
 
+## 1.0.8
+### Patch Changes
+
+- 65e8575: chore(release): bump core/sdk/validator after dev-publish, back-merge, check-changeset, preflight infra fixes
+- Updated dependencies [65e8575]
+  - @focus-mcp/core@1.5.2
+
 ## 1.0.7
 ### Patch Changes
 
