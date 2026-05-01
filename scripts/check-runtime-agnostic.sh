@@ -16,8 +16,23 @@ if [ ! -d "$CORE_SRC" ]; then
     exit 2
 fi
 
-# Search for Node.js built-in module imports (node: protocol imports and requires)
-NODE_IMPORTS=$(grep -rEn "from ['\"]node:|require\(['\"]node:" "$CORE_SRC" || true)
+# Search for Node.js built-in module imports (node: protocol — all import/require forms)
+# Patterns covered:
+#   from 'node:...'         static imports and re-exports (export ... from 'node:...')
+#   require('node:...')     CommonJS require
+#   import('node:...')      dynamic imports
+#   import 'node:...'       side-effect imports
+PATTERNS=(
+    "from[[:space:]]+['\"]node:"
+    "require[[:space:]]*\([[:space:]]*['\"]node:"
+    "import[[:space:]]*\([[:space:]]*['\"]node:"
+    "import[[:space:]]+['\"]node:"
+)
+NODE_IMPORTS=""
+for p in "${PATTERNS[@]}"; do
+    found=$(grep -rEn "$p" "$CORE_SRC" || true)
+    [ -n "$found" ] && NODE_IMPORTS="${NODE_IMPORTS}${found}"$'\n'
+done
 
 if [ -n "$NODE_IMPORTS" ]; then
     echo "ERROR: core must remain runtime-agnostic. Found Node.js-only imports:"
