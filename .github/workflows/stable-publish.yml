@@ -42,11 +42,23 @@ jobs:
                 VERSION=$(node -e "console.log(require('./${dir}package.json').version)")
                 echo "Publishing ${NAME}@${VERSION}..."
                 cd "$dir"
-                npm publish --access public 2>&1 || echo "  → skipped (already published?)"
+                PUBLISH_OUTPUT=$(npm publish --access public 2>&1)
+                PUBLISH_STATUS=$?
                 cd ../..
+
+                if [ $PUBLISH_STATUS -ne 0 ]; then
+                  echo "$PUBLISH_OUTPUT"
+                  if printf '%s' "$PUBLISH_OUTPUT" | grep -qi "cannot publish over the previously published versions"; then
+                    echo "  → skipped (already published)"
+                  else
+                    echo "  → publish failed"
+                    exit 1
+                  fi
+                fi
+
                 # Ensure @latest tag is set even if version was previously published
                 echo "Setting @latest tag for ${NAME}@${VERSION}..."
-                npm dist-tag add "${NAME}@${VERSION}" latest || echo "  → dist-tag update skipped"
+                npm dist-tag add "${NAME}@${VERSION}" latest
               fi
             fi
           done

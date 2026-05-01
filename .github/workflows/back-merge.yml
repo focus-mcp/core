@@ -92,8 +92,9 @@ jobs:
             --title "chore: back-merge main → develop" \
             --body "Automated back-merge of main into develop after release. Auto-merges once CI passes.")
           echo "PR created: $PR_URL"
-          gh pr merge "$PR_URL" --merge --auto --delete-branch || \
-            gh pr merge "$PR_URL" --merge --delete-branch
+          if ! gh pr merge "$PR_URL" --merge --auto --delete-branch; then
+            echo "::warning ::Could not enable auto-merge (may not be supported on this repo). PR left open for manual review: $PR_URL"
+          fi
 
       - name: Open PR if conflicts
         if: failure() && steps.merge.outcome == 'failure'
