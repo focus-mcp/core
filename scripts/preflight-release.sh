@@ -8,8 +8,11 @@
 
 set -uo pipefail
 
-REPO_NAME="$(basename "$PWD")"
+# Thread 7 fix: derive paths from git root, not $PWD — portable across subdirectory runs
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+REPO_NAME="$(basename "$ROOT")"
 REPO_FULL="focus-mcp/$REPO_NAME"
+cd "$ROOT"
 
 if [[ -t 1 ]]; then
   RED=$'\033[31m'; GREEN=$'\033[32m'; YELLOW=$'\033[33m'; BLUE=$'\033[34m'; RESET=$'\033[0m'
@@ -26,7 +29,8 @@ warn() { echo "${YELLOW}WARN${RESET} $1"; WARNINGS=$((WARNINGS+1)); }
 section() { echo ""; echo "${BLUE}== $1 ==${RESET}"; }
 
 echo "Pre-flight release check — $REPO_NAME"
-echo "Started at $(date -Iseconds)"
+# Thread 6 fix: date -Iseconds is GNU-only; use POSIX-compatible format
+echo "Started at $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
 # 1. Branch + working tree
 section "Branch & working tree"
@@ -77,7 +81,10 @@ if [[ "$PENDING_COUNT" -eq 0 ]]; then
 else
   pass "$PENDING_COUNT pending changeset(s)"
   for f in "${PENDING_FILES[@]}"; do
-    AGE_S=$(( $(date +%s) - $(stat -c '%Y' "$f" 2>/dev/null || echo 0) ))
+    # Thread 5 fix: stat -c is GNU-only; use git log commit time — portable and more meaningful
+    # (filesystem mtime may be reset on fresh checkout)
+    FILE_MTIME="$(git log -1 --format='%ct' -- "$f" 2>/dev/null || echo 0)"
+    AGE_S=$(( $(date +%s) - ${FILE_MTIME:-0} ))
     AGE_D=$(( AGE_S / 86400 ))
     if [[ "$AGE_D" -gt 7 ]]; then
       warn "  $(basename "$f") is $AGE_D days old"
@@ -119,9 +126,12 @@ section "Dependabot alerts"
 if command -v gh >/dev/null 2>&1; then
   HIGH="$(gh api "/repos/$REPO_FULL/dependabot/alerts?state=open&severity=high" --jq 'length' 2>/dev/null || echo '?')"
   CRIT="$(gh api "/repos/$REPO_FULL/dependabot/alerts?state=open&severity=critical" --jq 'length' 2>/dev/null || echo '?')"
-  if [[ "$CRIT" =~ ^[0-9]+$ && "$CRIT" -gt 0 ]]; then
+  # Thread 4 fix: treat non-numeric results (e.g. '?' from API failure) as WARN, not silent PASS
+  if [[ ! "$CRIT" =~ ^[0-9]+$ || ! "$HIGH" =~ ^[0-9]+$ ]]; then
+    warn "Dependabot alerts could not be queried (high=$HIGH, critical=$CRIT) — check manually"
+  elif [[ "$CRIT" -gt 0 ]]; then
     fail "$CRIT critical Dependabot alert(s) open"
-  elif [[ "$HIGH" =~ ^[0-9]+$ && "$HIGH" -gt 0 ]]; then
+  elif [[ "$HIGH" -gt 0 ]]; then
     warn "$HIGH high Dependabot alert(s) open"
   else
     pass "No HIGH/CRITICAL Dependabot alerts"
