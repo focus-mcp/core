@@ -40,7 +40,8 @@
         "version": "changeset version",
         "release": "changeset publish",
         "prepare": "husky",
-        "preflight": "bash scripts/preflight-release.sh"
+        "preflight": "bash scripts/preflight-release.sh",
+        "check:runtime-agnostic": "bash scripts/check-runtime-agnostic.sh"
     },
     "size-limit": [
         {
