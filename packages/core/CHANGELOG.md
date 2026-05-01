@@ -1,5 +1,10 @@
 <!--
 
+## 1.5.2
+### Patch Changes
+
+- 65e8575: chore(release): bump core/sdk/validator after dev-publish, back-merge, check-changeset, preflight infra fixes
+
 ## 1.5.1
 ### Patch Changes
 

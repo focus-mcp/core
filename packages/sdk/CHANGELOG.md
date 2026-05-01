@@ -1,5 +1,11 @@
 <!--
 
+## 1.5.2
+### Patch Changes
+
+- Updated dependencies [65e8575]
+  - @focus-mcp/core@1.5.2
+
 ## 1.5.1
 ### Patch Changes
 
