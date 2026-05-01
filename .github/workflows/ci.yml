@@ -156,6 +156,14 @@ jobs:
           path: sbom.json
           retention-days: 90
 
+  runtime-agnostic-check:
+    name: Runtime-agnostic guard (core)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check no Node-only imports in core
+        run: bash scripts/check-runtime-agnostic.sh
+
   build:
     name: Build
     runs-on: ubuntu-latest
