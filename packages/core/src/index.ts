@@ -26,6 +26,24 @@ export {
     InProcessEventBus,
 } from './event-bus/event-bus.ts';
 export {
+    CONCEPTS,
+    type Concept,
+    getConcept,
+    getHelpIndex,
+    type HelpIndex,
+} from './help/index.ts';
+export {
+    type BrickRecommendation,
+    type DetectedStack,
+    detectStack,
+    type InitResult,
+    initProject,
+    type MonorepoType,
+    type ProjectFiles,
+    recommendBricks,
+    type StackPrimary,
+} from './init/index.ts';
+export {
     type BrickLoaderOptions,
     type BrickLoadFailure,
     type BrickLoadResult,
