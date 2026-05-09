@@ -1,0 +1,34 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CONCEPTS > concept content snapshot (catches unintended drift) 1`] = `
+{
+  "benchmarks": {
+    "description": "Every brick is benchmarked deterministically (Math.ceil(JSON.stringify(output).length / 4)) against a stable test fixture. Results: https://github.com/focus-mcp/marketplace/blob/main/benchmarks/equivalence-report.md",
+    "title": "Benchmarks",
+  },
+  "bootstrap": {
+    "description": "First-time setup of FocusMCP for a project. Use focus_init to detect the stack and get brick recommendations. Then focus_bricks_install for each recommended brick.",
+    "title": "Bootstrap",
+  },
+  "brick": {
+    "description": "An atomic MCP module covering one domain (git, files, code-intel, etc.). FocusMCP composes bricks on demand to keep the agent's context lean. Each brick exposes its own MCP tools via a manifest.",
+    "title": "Brick",
+  },
+  "catalog": {
+    "description": "A JSON document listing available bricks with metadata (name, version, keywords, recommendedFor). Default catalog is hosted at https://focus-mcp.github.io/marketplace/catalog.json. Multi-source: users can add private/team catalogs in ~/.focus/catalogs.json.",
+    "title": "Catalog",
+  },
+  "center": {
+    "description": "The user's brick manifest at ~/.focus/center.json. Lists installed bricks with version + enabled flag. FocusMCP reads this on start to know which bricks to load.",
+    "title": "Center",
+  },
+  "filtering": {
+    "description": "Hide/show/pin/unpin individual tools or globs. Persisted in ~/.focus/config.json. Tools: focus_tools_hide, focus_tools_show, focus_tools_pin, focus_tools_unpin, focus_tools_list.",
+    "title": "Tool filtering",
+  },
+  "namespace": {
+    "description": "Tools follow a <prefix>_<action> naming pattern, where <prefix> is the brick's manifest prefix (typically the brick name, e.g. git, cache, treesitter) and <action> is the tool name within that brick. Examples: git_log, cache_get, treesitter_index. Plus the orchestrator hub: focus_bricks_*, focus_catalog_*, focus_tools_*, focus_init, focus_help.",
+    "title": "Namespace",
+  },
+}
+`;
