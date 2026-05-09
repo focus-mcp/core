@@ -15,6 +15,9 @@ export { CONCEPTS } from './concepts.ts';
 
 export interface HelpIndex {
     readonly concepts: readonly { readonly key: string; readonly title: string }[];
+    // Intentional snake_case: this type is serialized as JSON at the MCP boundary
+    // (consumed by AI agents). camelCase here would force a needless mapping in cli.
+    // Internal core types (e.g. EventBusOptions) use camelCase as expected.
     readonly agent_guide_url: string;
     readonly readme_url: string;
 }

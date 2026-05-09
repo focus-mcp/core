@@ -105,6 +105,31 @@ describe('detectStack', () => {
         expect(stack.monorepo?.type).toBe('yarn-workspace');
     });
 
+    it('classifies as monorepo when yarn-workspace coexists with a marker file', () => {
+        // pnpm-workspace.yaml wins on detectMonorepoType (checked first), but
+        // even if yarn workspaces are also declared in package.json the project
+        // must still be classified as a monorepo (regression test for the
+        // isMonorepo edge case).
+        const stack = detectStack(
+            mockFiles({
+                'turbo.json': true,
+                'package.json': JSON.stringify({ workspaces: ['packages/*'] }),
+            }),
+        );
+        // detectMonorepoType returns 'turborepo' first (turbo.json before package.json check),
+        // so the monorepo type is turborepo and isMonorepo must be true.
+        expect(stack.primary).toBe('monorepo');
+        expect(stack.monorepo?.type).toBe('turborepo');
+    });
+
+    it('classifies as monorepo when only a marker file exists with no parseable workspaces', () => {
+        // Defensive case: hasMonorepoFile is true even when detectMonorepoType
+        // would return null due to inconsistent IO. isMonorepo must still be true.
+        const stack = detectStack(mockFiles({ 'pnpm-workspace.yaml': true }));
+        expect(stack.primary).toBe('monorepo');
+        expect(stack.monorepo?.type).toBe('pnpm-workspace');
+    });
+
     it('detects TS/JS frameworks from package.json deps', () => {
         const stack = detectStack(
             mockFiles({
@@ -578,6 +603,31 @@ describe('recommendBricks', () => {
         for (const r of recs) {
             expect(r.reason.length).toBeGreaterThan(0);
         }
+    });
+
+    it('routes reason for TS/JS branch only mentions matching frameworks (not python ones)', () => {
+        // In a TS monorepo that also contains a Python service, stack.frameworks
+        // can mix ecosystems (e.g. ['next', 'fastapi']). The routes reason in the
+        // TS branch must mention only TS/JS routing frameworks, never Python ones.
+        const recs = recommendBricks({
+            primary: 'monorepo',
+            detected_files: ['pnpm-workspace.yaml', 'package.json', 'pyproject.toml'],
+            monorepo: { type: 'pnpm-workspace' },
+            frameworks: ['next', 'fastapi'],
+        });
+        const tsRoutes = recs.find(
+            (r) =>
+                r.name === 'routes' && r.reason.includes('next') && !r.reason.includes('fastapi'),
+        );
+        // At least one routes entry mentions only the TS framework. The Python
+        // branch produces a separate routes reason (deduped on name) but the
+        // first push wins via pushUnique → check the surviving reason mentions next, not fastapi.
+        const routesRec = recs.find((r) => r.name === 'routes');
+        expect(routesRec).toBeDefined();
+        expect(routesRec?.reason).toContain('next');
+        expect(routesRec?.reason).not.toContain('fastapi');
+        // sanity: the helper variable above was used for clarity
+        expect(tsRoutes).toBeDefined();
     });
 });
 

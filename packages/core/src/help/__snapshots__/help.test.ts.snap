@@ -27,7 +27,7 @@ exports[`CONCEPTS > concept content snapshot (catches unintended drift) 1`] = `
     "title": "Tool filtering",
   },
   "namespace": {
-    "description": "Tools follow <brick>_<action> naming (e.g. git_log, files_read). Plus the orchestrator hub: focus_bricks_*, focus_catalog_*, focus_tools_*, focus_init, focus_help.",
+    "description": "Tools follow a <prefix>_<action> naming pattern, where <prefix> is the brick's manifest prefix (typically the brick name, e.g. git, cache, treesitter) and <action> is the tool name within that brick. Examples: git_log, cache_get, treesitter_index. Plus the orchestrator hub: focus_bricks_*, focus_catalog_*, focus_tools_*, focus_init, focus_help.",
     "title": "Namespace",
   },
 }
