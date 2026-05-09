@@ -1,5 +1,11 @@
 <!--
 
+## 1.6.0
+### Patch Changes
+
+- Updated dependencies [c2ce443]
+  - @focus-mcp/core@1.6.0
+
 ## 1.5.2
 ### Patch Changes
 
