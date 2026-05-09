@@ -25,3 +25,7 @@ License: MIT
 Files: .husky/**
 Copyright: 2026 FocusMCP contributors
 License: MIT
+
+Files: packages/**/__snapshots__/**
+Copyright: 2026 FocusMCP contributors
+License: MIT
