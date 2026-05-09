@@ -139,9 +139,11 @@ function detectGoFrameworks(files: ProjectFiles): string[] {
     if (!text) return [];
     const blob = text.toLowerCase();
     const found: string[] = [];
-    if (/github\.com\/gin-gonic\/gin\b/.test(blob)) found.push('gin');
-    if (/github\.com\/labstack\/echo\b/.test(blob)) found.push('echo');
-    if (/github\.com\/gofiber\/fiber\b/.test(blob)) found.push('fiber');
+    // Anchor at start-of-line or whitespace boundary to avoid matching
+    // arbitrary hosts that contain the path as a suffix (e.g. evil.com/github.com/...).
+    if (/(^|\s)github\.com\/gin-gonic\/gin(\s|$)/m.test(blob)) found.push('gin');
+    if (/(^|\s)github\.com\/labstack\/echo(\s|$)/m.test(blob)) found.push('echo');
+    if (/(^|\s)github\.com\/gofiber\/fiber(\s|$)/m.test(blob)) found.push('fiber');
     return found;
 }
 
