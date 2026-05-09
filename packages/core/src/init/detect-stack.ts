@@ -31,6 +31,9 @@ export type MonorepoType = 'pnpm-workspace' | 'turborepo' | 'lerna' | 'nx' | 'ya
 
 export interface DetectedStack {
     readonly primary: StackPrimary;
+    // Intentional snake_case: this type is serialized as JSON at the MCP boundary
+    // (consumed by AI agents). camelCase here would force a needless mapping in cli.
+    // Internal core types (e.g. EventBusOptions) use camelCase as expected.
     readonly detected_files: readonly string[];
     readonly monorepo?: { type: MonorepoType };
     readonly frameworks: readonly string[];
@@ -240,9 +243,11 @@ function collectFrameworks(files: ProjectFiles, markers: FileMarkers): string[] 
 export function detectStack(files: ProjectFiles): DetectedStack {
     const markers = collectMarkers(files);
     const monorepoType = detectMonorepoType(files);
-    // yarn workspaces alone (no marker file) still counts as a monorepo
-    const isMonorepo =
-        monorepoType !== null && (monorepoType !== 'yarn-workspace' || !markers.hasMonorepoFile);
+    // Any detected monorepo type (workspace marker file OR yarn workspaces in
+    // package.json) classifies the project as a monorepo. ProjectFiles is
+    // injected and may be inconsistent across calls, so we also fall back to
+    // hasMonorepoFile defensively.
+    const isMonorepo = monorepoType !== null || markers.hasMonorepoFile;
 
     const primary = pickPrimary(markers, isMonorepo);
     const frameworks = collectFrameworks(files, markers);

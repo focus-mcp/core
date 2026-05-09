@@ -5,11 +5,15 @@
  * Brick recommendation engine — pure, browser-compatible.
  *
  * Maps a DetectedStack to a list of recommended bricks, mirroring the
- * decision tree in cli/docs/AGENT_GUIDE.md. Ordering is curated:
+ * decision tree in https://github.com/focus-mcp/cli/blob/main/docs/AGENT_GUIDE.md.
+ * Ordering is curated:
  *   - universal essentials first (filesystem-ish + search)
- *   - language-specific code intel next
- *   - framework-specific extras after
- *   - monorepo extras last
+ *   - git next when version control is detected
+ *   - then, depending on the primary stack:
+ *     - monorepo: workspace extras (repos/impact/graphbuild/graphquery)
+ *       followed by language-specific intel for each detected ecosystem
+ *     - typescript/javascript/python/go/rust: language-specific intel
+ *       followed by framework-specific extras (e.g. routes for next/fastapi/gin/axum)
  *
  * Brick names match the official marketplace catalog. When a composite
  * brick is available (e.g. `codebase` bundles treesitter/symbol/refs/…),
@@ -60,10 +64,12 @@ function pushTsJs(list: InternalRec[], stack: DetectedStack): void {
 
     // Framework-specific extras
     const frameworks = new Set(stack.frameworks);
-    if (frameworks.has('next') || frameworks.has('nuxt') || frameworks.has('svelte')) {
+    const tsJsRouteFrameworks = ['next', 'nuxt', 'svelte'] as const;
+    const matched = tsJsRouteFrameworks.filter((fw) => frameworks.has(fw));
+    if (matched.length > 0) {
         pushUnique(list, {
             name: 'routes',
-            reason: `Detect HTTP routes (${[...frameworks].join(', ')} app).`,
+            reason: `Detect HTTP routes (${matched.join(', ')} app).`,
         });
     }
 }
@@ -79,10 +85,12 @@ function pushPython(list: InternalRec[], stack: DetectedStack): void {
     pushUnique(list, { name: 'shell', reason: 'Run pytest, ruff, mypy and other tools.' });
 
     const frameworks = new Set(stack.frameworks);
-    if (frameworks.has('fastapi') || frameworks.has('flask') || frameworks.has('django')) {
+    const pyRouteFrameworks = ['fastapi', 'flask', 'django'] as const;
+    const matched = pyRouteFrameworks.filter((fw) => frameworks.has(fw));
+    if (matched.length > 0) {
         pushUnique(list, {
             name: 'routes',
-            reason: `Detect HTTP routes (${[...frameworks].join(', ')} app).`,
+            reason: `Detect HTTP routes (${matched.join(', ')} app).`,
         });
     }
 }
@@ -95,10 +103,12 @@ function pushGo(list: InternalRec[], stack: DetectedStack): void {
     pushUnique(list, { name: 'shell', reason: 'Run go test, go build, go vet.' });
 
     const frameworks = new Set(stack.frameworks);
-    if (frameworks.has('gin') || frameworks.has('echo') || frameworks.has('fiber')) {
+    const goRouteFrameworks = ['gin', 'echo', 'fiber'] as const;
+    const matched = goRouteFrameworks.filter((fw) => frameworks.has(fw));
+    if (matched.length > 0) {
         pushUnique(list, {
             name: 'routes',
-            reason: `Detect HTTP routes (${[...frameworks].join(', ')} app).`,
+            reason: `Detect HTTP routes (${matched.join(', ')} app).`,
         });
     }
 }
@@ -113,10 +123,12 @@ function pushRust(list: InternalRec[], stack: DetectedStack): void {
     pushUnique(list, { name: 'shell', reason: 'Run cargo build, cargo test, clippy.' });
 
     const frameworks = new Set(stack.frameworks);
-    if (frameworks.has('axum') || frameworks.has('rocket') || frameworks.has('actix-web')) {
+    const rustRouteFrameworks = ['axum', 'rocket', 'actix-web'] as const;
+    const matched = rustRouteFrameworks.filter((fw) => frameworks.has(fw));
+    if (matched.length > 0) {
         pushUnique(list, {
             name: 'routes',
-            reason: `Detect HTTP routes (${[...frameworks].join(', ')} app).`,
+            reason: `Detect HTTP routes (${matched.join(', ')} app).`,
         });
     }
 }

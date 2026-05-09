@@ -33,7 +33,7 @@ export const CONCEPTS: Record<string, Concept> = {
     namespace: {
         title: 'Namespace',
         description:
-            'Tools follow <brick>_<action> naming (e.g. git_log, files_read). Plus the orchestrator hub: focus_bricks_*, focus_catalog_*, focus_tools_*, focus_init, focus_help.',
+            "Tools follow a <prefix>_<action> naming pattern, where <prefix> is the brick's manifest prefix (typically the brick name, e.g. git, cache, treesitter) and <action> is the tool name within that brick. Examples: git_log, cache_get, treesitter_index. Plus the orchestrator hub: focus_bricks_*, focus_catalog_*, focus_tools_*, focus_init, focus_help.",
     },
     filtering: {
         title: 'Tool filtering',
