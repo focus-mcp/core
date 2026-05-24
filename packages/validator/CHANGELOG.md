@@ -1,4 +1,11 @@
 <!--
+SPDX-FileCopyrightText: 2026 FocusMCP contributors
+SPDX-License-Identifier: MIT
+-->
+
+# @focus-mcp/validator
+
+<!--
 
 ## 1.0.10
 ### Patch Changes

@@ -1,4 +1,11 @@
 <!--
+SPDX-FileCopyrightText: 2026 FocusMCP contributors
+SPDX-License-Identifier: MIT
+-->
+
+# @focus-mcp/sdk
+
+<!--
 
 ## 1.7.0
 ### Patch Changes

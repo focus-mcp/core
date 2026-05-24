@@ -1,4 +1,11 @@
 <!--
+SPDX-FileCopyrightText: 2026 FocusMCP contributors
+SPDX-License-Identifier: MIT
+-->
+
+# @focus-mcp/core
+
+<!--
 
 ## 1.7.0
 ### Minor Changes
