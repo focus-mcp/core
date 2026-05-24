@@ -20,6 +20,16 @@ export interface BrickSource {
     readManifest(name: string): Promise<unknown>;
     /** Module ESM de la brique. Doit exposer un `default` conforme à `Brick`. */
     loadModule(name: string): Promise<unknown>;
+    /**
+     * Optional fallback for the manifest `version` field. Bricks published
+     * to npm don't embed their version in `mcp-brick.json` — it lives in
+     * `package.json` instead. When a source can provide that value here,
+     * the loader injects it into both the disk and module manifests
+     * before validation, avoiding spurious INVALID_VERSION errors.
+     * Returning `undefined` is fine; the loader then falls through to its
+     * existing behaviour (which throws INVALID_VERSION).
+     */
+    readPackageVersion?(name: string): Promise<string | undefined>;
 }
 
 export interface BrickLoaderOptions {
@@ -49,9 +59,22 @@ export async function loadBricks(options: BrickLoaderOptions): Promise<BrickLoad
 
     for (const name of names) {
         try {
-            const sourceManifest = parseManifest(await source.readManifest(name));
+            // If the source provides readPackageVersion() but it throws (e.g.
+            // package.json missing), don't fail the brick — fall back to the
+            // manifest's own version field if any. The manifest validator
+            // will surface INVALID_VERSION later if neither is available.
+            let pkgVersion: string | undefined;
+            if (source.readPackageVersion) {
+                try {
+                    pkgVersion = await source.readPackageVersion(name);
+                } catch {
+                    pkgVersion = undefined;
+                }
+            }
+            const rawSource = await source.readManifest(name);
+            const sourceManifest = parseManifest(injectVersion(rawSource, pkgVersion));
             const brick = extractBrick(await source.loadModule(name));
-            const moduleManifest = parseManifest(brick.manifest);
+            const moduleManifest = parseManifest(injectVersion(brick.manifest, pkgVersion));
 
             if (canonicalize(sourceManifest) !== canonicalize(moduleManifest)) {
                 throw new Error(
@@ -59,6 +82,13 @@ export async function loadBricks(options: BrickLoaderOptions): Promise<BrickLoad
                 );
             }
 
+            // Surface the injected version on the returned brick so consumers
+            // (e.g. CLI doctor, dashboard, registry) see the resolved version
+            // instead of the raw manifest export that may lack it.
+            // We mutate `brick.manifest` in place rather than spreading into a
+            // new object — `Brick` may be a class instance whose `start`/`stop`
+            // methods live on the prototype, which object spread would drop.
+            (brick as { manifest: typeof moduleManifest }).manifest = moduleManifest;
             bricks.push(brick);
         } catch (cause) {
             failures.push({ name, error: toError(cause) });
@@ -100,4 +130,17 @@ function canonicalize(value: unknown): string {
 
 function toError(cause: unknown): Error {
     return cause instanceof Error ? cause : new Error(String(cause));
+}
+
+/**
+ * If the raw manifest doesn't carry a `version` field, inject `pkgVersion`
+ * from the source's package.json. Existing version values are preserved
+ * unchanged. Non-object raw values are passed through untouched.
+ */
+function injectVersion(raw: unknown, pkgVersion: string | undefined): unknown {
+    if (pkgVersion === undefined) return raw;
+    if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) return raw;
+    const obj = raw as Record<string, unknown>;
+    if (obj['version'] !== undefined) return raw;
+    return { ...obj, version: pkgVersion };
 }
