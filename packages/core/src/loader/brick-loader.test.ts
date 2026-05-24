@@ -255,6 +255,43 @@ describe('loadBricks', () => {
         expect(result.bricks[0]?.manifest.version).toBe('1.0.0');
     });
 
+    it('preserves prototype-defined methods on class-instance bricks', async () => {
+        // A brick can legitimately be a class instance (start/stop on the
+        // prototype, not own properties). Object spread would drop them.
+        class ClassBrick {
+            manifest = {
+                name: 'class-brick',
+                prefix: 'cb',
+                description: 'class instance',
+                dependencies: [],
+                tools: [],
+            };
+            start() {
+                /* prototype method */
+            }
+            stop() {
+                /* prototype method */
+            }
+        }
+        const instance = new ClassBrick();
+        const source: BrickSource = {
+            list: vi.fn(async () => ['class-brick']),
+            readManifest: vi.fn(async () => instance.manifest),
+            loadModule: vi.fn(async () => ({ default: instance })),
+            readPackageVersion: vi.fn(async () => '3.0.0'),
+        };
+
+        const result = await loadBricks({ source });
+
+        expect(result.failures).toEqual([]);
+        const loaded = result.bricks[0];
+        expect(loaded?.manifest.version).toBe('3.0.0');
+        // The class prototype methods must survive the version injection.
+        expect(typeof loaded?.start).toBe('function');
+        expect(typeof loaded?.stop).toBe('function');
+        expect(Object.getPrototypeOf(loaded)).toBe(ClassBrick.prototype);
+    });
+
     it('does not fail the load when readPackageVersion throws but manifest already has version', async () => {
         // Hook can throw (e.g. package.json not found). When the manifest
         // already carries a valid version, the load must still succeed —

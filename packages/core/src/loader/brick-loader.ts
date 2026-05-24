@@ -85,7 +85,11 @@ export async function loadBricks(options: BrickLoaderOptions): Promise<BrickLoad
             // Surface the injected version on the returned brick so consumers
             // (e.g. CLI doctor, dashboard, registry) see the resolved version
             // instead of the raw manifest export that may lack it.
-            bricks.push({ ...brick, manifest: moduleManifest });
+            // We mutate `brick.manifest` in place rather than spreading into a
+            // new object — `Brick` may be a class instance whose `start`/`stop`
+            // methods live on the prototype, which object spread would drop.
+            (brick as { manifest: typeof moduleManifest }).manifest = moduleManifest;
+            bricks.push(brick);
         } catch (cause) {
             failures.push({ name, error: toError(cause) });
         }
