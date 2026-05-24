@@ -196,4 +196,132 @@ describe('loadBricks', () => {
         expect(result.bricks.map((b) => b.manifest.name)).toEqual(['a', 'b']);
         expect(result.failures.map((f) => f.name)).toEqual(['broken']);
     });
+
+    // ---------- readPackageVersion hook (manifest version injection) ----------
+
+    it('injects readPackageVersion() result when manifest has no version', async () => {
+        // Manifest without version (matches the current shape of every
+        // published @focus-mcp/brick-*/mcp-brick.json).
+        const manifestNoVersion = {
+            name: 'no-ver',
+            prefix: 'nv',
+            description: 'manifest without version',
+            dependencies: [],
+            tools: [],
+        };
+        // Both the disk manifest AND the module-exported manifest lack version.
+        const brickWithoutVersion = {
+            manifest: manifestNoVersion,
+            start() {
+                /* noop */
+            },
+            stop() {
+                /* noop */
+            },
+        };
+        const source: BrickSource = {
+            list: vi.fn(async () => ['no-ver']),
+            readManifest: vi.fn(async () => manifestNoVersion),
+            loadModule: vi.fn(async () => ({ default: brickWithoutVersion })),
+            readPackageVersion: vi.fn(async () => '2.5.7'),
+        };
+
+        const result = await loadBricks({ source });
+
+        expect(result.failures).toEqual([]);
+        expect(result.bricks).toHaveLength(1);
+        // The injected version must reach the returned brick — consumers
+        // (CLI doctor, dashboard, registry) rely on `brick.manifest.version`.
+        expect(result.bricks[0]?.manifest.version).toBe('2.5.7');
+        expect(source.readPackageVersion).toHaveBeenCalledWith('no-ver');
+    });
+
+    it('does not override an existing manifest version', async () => {
+        // Manifest already has version '1.0.0' (set by makeManifest). The
+        // readPackageVersion hook returns '2.5.7' but the explicit field
+        // must win — the hook is a fallback, not an override.
+        const manifestWithVersion = makeManifest('explicit-ver');
+        const brick = makeBrick(manifestWithVersion);
+        const source: BrickSource = {
+            list: vi.fn(async () => ['explicit-ver']),
+            readManifest: vi.fn(async () => manifestWithVersion),
+            loadModule: vi.fn(async () => ({ default: brick })),
+            readPackageVersion: vi.fn(async () => '2.5.7'),
+        };
+
+        const result = await loadBricks({ source });
+
+        expect(result.failures).toEqual([]);
+        expect(result.bricks[0]?.manifest.version).toBe('1.0.0');
+    });
+
+    it('does not fail the load when readPackageVersion throws but manifest already has version', async () => {
+        // Hook can throw (e.g. package.json not found). When the manifest
+        // already carries a valid version, the load must still succeed —
+        // the hook is a fallback, never a hard dependency.
+        const manifestWithVersion = makeManifest('resilient');
+        const brick = makeBrick(manifestWithVersion);
+        const source: BrickSource = {
+            list: vi.fn(async () => ['resilient']),
+            readManifest: vi.fn(async () => manifestWithVersion),
+            loadModule: vi.fn(async () => ({ default: brick })),
+            readPackageVersion: vi.fn(async () => {
+                throw new Error('package.json not found');
+            }),
+        };
+
+        const result = await loadBricks({ source });
+
+        expect(result.failures).toEqual([]);
+        expect(result.bricks[0]?.manifest.version).toBe('1.0.0');
+    });
+
+    it('records a failure when manifest has no version AND readPackageVersion is absent', async () => {
+        // Source doesn't implement the optional readPackageVersion hook,
+        // and the manifest itself has no version — preserves the existing
+        // INVALID_VERSION behaviour.
+        const manifestNoVersion = {
+            name: 'no-ver',
+            prefix: 'nv',
+            description: 'manifest without version',
+            dependencies: [],
+            tools: [],
+        };
+        const source = makeSource([{ name: 'no-ver', manifest: manifestNoVersion }]);
+        const result = await loadBricks({ source });
+        expect(result.bricks).toEqual([]);
+        expect(result.failures).toHaveLength(1);
+        expect(result.failures[0]?.error.message).toMatch(/version/i);
+    });
+
+    it('records a failure when manifest has no version AND readPackageVersion returns undefined', async () => {
+        const manifestNoVersion = {
+            name: 'no-ver',
+            prefix: 'nv',
+            description: 'manifest without version',
+            dependencies: [],
+            tools: [],
+        };
+        const source: BrickSource = {
+            list: vi.fn(async () => ['no-ver']),
+            readManifest: vi.fn(async () => manifestNoVersion),
+            loadModule: vi.fn(async () => ({
+                default: {
+                    manifest: manifestNoVersion,
+                    start() {
+                        /* noop */
+                    },
+                    stop() {
+                        /* noop */
+                    },
+                },
+            })),
+            readPackageVersion: vi.fn(async () => undefined),
+        };
+
+        const result = await loadBricks({ source });
+        expect(result.bricks).toEqual([]);
+        expect(result.failures).toHaveLength(1);
+        expect(result.failures[0]?.error.message).toMatch(/version/i);
+    });
 });
