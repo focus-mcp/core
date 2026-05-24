@@ -32,6 +32,11 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org
           scope: '@focus-mcp'
+      # Trusted Publishing requires npm CLI >= 11.5.1. Node 22 ships with npm 10.x.
+      # Pinned to ^11 (not @latest) so a future npm 12 cannot silently regress
+      # the OIDC token exchange without us noticing.
+      - name: Upgrade npm to v11 (required for OIDC Trusted Publishing)
+        run: npm install -g npm@^11
       - run: pnpm install --frozen-lockfile
       - name: Check for pending changesets
         id: pending
@@ -50,6 +55,11 @@ jobs:
       - name: Publish all packages with dev tag
         if: steps.pending.outputs.count != '0'
         run: pnpm changeset publish --no-git-tag --tag dev
-        # NODE_AUTH_TOKEN fallback: kept for rollback if Trusted Publisher not yet configured on npmjs.com
+        # Auth: Trusted Publishers (OIDC) via id-token: write permission.
+        # NPM_CONFIG_PROVENANCE=true triggers npm to mint an OIDC token from
+        # GitHub Actions and exchange it for a publish token at the registry.
+        # NODE_AUTH_TOKEN is intentionally NOT set — when defined (even empty),
+        # npm tries the static token first and falls back to OIDC only on
+        # specific failures, causing a confusing 404 on PUT.
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
