@@ -59,9 +59,18 @@ export async function loadBricks(options: BrickLoaderOptions): Promise<BrickLoad
 
     for (const name of names) {
         try {
-            const pkgVersion = source.readPackageVersion
-                ? await source.readPackageVersion(name)
-                : undefined;
+            // If the source provides readPackageVersion() but it throws (e.g.
+            // package.json missing), don't fail the brick — fall back to the
+            // manifest's own version field if any. The manifest validator
+            // will surface INVALID_VERSION later if neither is available.
+            let pkgVersion: string | undefined;
+            if (source.readPackageVersion) {
+                try {
+                    pkgVersion = await source.readPackageVersion(name);
+                } catch {
+                    pkgVersion = undefined;
+                }
+            }
             const rawSource = await source.readManifest(name);
             const sourceManifest = parseManifest(injectVersion(rawSource, pkgVersion));
             const brick = extractBrick(await source.loadModule(name));
@@ -73,7 +82,10 @@ export async function loadBricks(options: BrickLoaderOptions): Promise<BrickLoad
                 );
             }
 
-            bricks.push(brick);
+            // Surface the injected version on the returned brick so consumers
+            // (e.g. CLI doctor, dashboard, registry) see the resolved version
+            // instead of the raw manifest export that may lack it.
+            bricks.push({ ...brick, manifest: moduleManifest });
         } catch (cause) {
             failures.push({ name, error: toError(cause) });
         }

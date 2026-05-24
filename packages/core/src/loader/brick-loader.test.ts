@@ -230,12 +230,16 @@ describe('loadBricks', () => {
 
         expect(result.failures).toEqual([]);
         expect(result.bricks).toHaveLength(1);
+        // The injected version must reach the returned brick — consumers
+        // (CLI doctor, dashboard, registry) rely on `brick.manifest.version`.
+        expect(result.bricks[0]?.manifest.version).toBe('2.5.7');
         expect(source.readPackageVersion).toHaveBeenCalledWith('no-ver');
     });
 
     it('does not override an existing manifest version', async () => {
-        // Manifest already has version '9.9.9'; readPackageVersion returns
-        // '1.0.0' but the explicit version must win.
+        // Manifest already has version '1.0.0' (set by makeManifest). The
+        // readPackageVersion hook returns '2.5.7' but the explicit field
+        // must win — the hook is a fallback, not an override.
         const manifestWithVersion = makeManifest('explicit-ver');
         const brick = makeBrick(manifestWithVersion);
         const source: BrickSource = {
@@ -243,6 +247,27 @@ describe('loadBricks', () => {
             readManifest: vi.fn(async () => manifestWithVersion),
             loadModule: vi.fn(async () => ({ default: brick })),
             readPackageVersion: vi.fn(async () => '2.5.7'),
+        };
+
+        const result = await loadBricks({ source });
+
+        expect(result.failures).toEqual([]);
+        expect(result.bricks[0]?.manifest.version).toBe('1.0.0');
+    });
+
+    it('does not fail the load when readPackageVersion throws but manifest already has version', async () => {
+        // Hook can throw (e.g. package.json not found). When the manifest
+        // already carries a valid version, the load must still succeed —
+        // the hook is a fallback, never a hard dependency.
+        const manifestWithVersion = makeManifest('resilient');
+        const brick = makeBrick(manifestWithVersion);
+        const source: BrickSource = {
+            list: vi.fn(async () => ['resilient']),
+            readManifest: vi.fn(async () => manifestWithVersion),
+            loadModule: vi.fn(async () => ({ default: brick })),
+            readPackageVersion: vi.fn(async () => {
+                throw new Error('package.json not found');
+            }),
         };
 
         const result = await loadBricks({ source });
